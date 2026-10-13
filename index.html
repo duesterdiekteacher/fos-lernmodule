@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lernplattform FOS</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
+            color: #f8fafc;
+            padding: 3rem 1rem;
+            line-height: 1.6;
+        }
+
+        .wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 {
+            color: #38bdf8;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .intro {
+            color: #cbd5e1;
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .intro p + p {
+            margin-top: 0.4rem;
+        }
+
+        h2 {
+            color: #e2e8f0;
+            font-size: 1.4rem;
+            margin-bottom: 1.25rem;
+            padding-left: 0.25rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .topic {
+            display: flex;
+            flex-direction: column;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 2rem;
+            color: inherit;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .topic:hover,
+        .topic:focus-visible {
+            transform: translateY(-4px);
+            border-color: #38bdf8;
+            outline: none;
+        }
+
+        .topic .icon {
+            font-size: 2.8rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .topic h3 {
+            color: #38bdf8;
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .topic .area {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .topic .desc {
+            color: #cbd5e1;
+            font-size: 1.05rem;
+            margin-bottom: 1.25rem;
+            flex-grow: 1;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tag {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.7rem;
+            border-radius: 999px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+        }
+
+        .start {
+            display: block;
+            text-align: center;
+            background: linear-gradient(90deg, #0ea5e9, #22c55e);
+            color: white;
+            font-weight: 600;
+            padding: 0.9rem 1.5rem;
+            border-radius: 10px;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 3rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-link:hover {
+            color: #38bdf8;
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            background: #1e293b;
+            border: 2px dashed #334155;
+            border-radius: 16px;
+            padding: 2.5rem 1.5rem;
+        }
+
+        .area-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .area-card {
+            text-align: center;
+            padding: 2.5rem 2rem;
+        }
+
+        .area-card .icon {
+            font-size: 4rem;
+        }
+
+        .area-card h3 {
+            font-size: 2rem;
+        }
+
+        .start.shk {
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+        }
+
+        .start.metall {
+            background: linear-gradient(90deg, #64748b, #0ea5e9);
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <header>
+        <div class="logo">🔬</div>
+        <h1>Lernplattform FOS</h1>
+        <div class="intro">
+            <p>Interaktive Lernmodule für die Fachoberschule.</p>
+            <p>Wählen Sie ein Thema aus.</p>
+            <p>Jedes Thema hat Lerntexte, Aufgaben und ein Abzeichen am Ende.</p>
+        </div>
+    </header>
+
+    <h2>Naturwissenschaften</h2>
+
+    <div class="grid">
+
+        <!-- THEMA: Gravitation und Gewichtskraft -->
+        <a class="topic" href="gravitation/">
+            <div class="icon">🍎</div>
+            <h3>Gravitation und Gewichtskraft</h3>
+            <div class="area">Kräfte und ihre Wirkungen · 12. Klasse</div>
+            <div class="desc">
+                Newtons Gravitationsgesetz, Ortsfaktor und Gewichtskraft.
+                Von der Erde über den Mond bis zur Raumstation ISS.
+            </div>
+            <div class="tags">
+                <span class="tag">🚀 Komplett</span>
+                <span class="tag">📖 Kompakt</span>
+                <span class="tag">📝 Quiz</span>
+            </div>
+        </a>
+
+        <!-- NEUE THEMEN HIER EINFÜGEN (Links mit themenordner/) -->
+
+    </div>
+
+    <footer>
+        Lernmodule für die Fachoberschule
+    </footer>
+
+</div>
+
+</body>
+</html>

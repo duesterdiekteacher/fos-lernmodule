@@ -1,0 +1,482 @@
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #f8fafc;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+        
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            color: #38bdf8;
+        }
+        
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+            color: #cbd5e1;
+        }
+        
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 5px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #0ea5e9, #22c55e);
+            height: 30px;
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+        }
+        
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .module-card {
+            background: #1e293b;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #334155;
+        }
+        
+        .module-card:hover:not(.locked) {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(56, 189, 248, 0.2);
+            border-color: #38bdf8;
+        }
+        
+        /* Module 5 und 6 farblich dezent abgesetzt (dunkles Indigo) */
+        .module-card.advanced-card {
+            background: #16122c;
+            border-color: #4c1d95;
+        }
+        
+        .module-card.advanced-card:hover:not(.locked) {
+            border-color: #a855f7;
+            box-shadow: 0 8px 15px rgba(168, 85, 247, 0.2);
+        }
+        
+        .module-card.completed {
+            border-color: #22c55e !important;
+        }
+        
+        .module-card.completed::before {
+            content: "✓";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #22c55e;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .module-card.locked {
+            background: #0f111a;
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+        
+        .module-card.locked::before {
+            content: "🔒";
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+        }
+        
+        .module-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .module-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #f1f5f9;
+            margin-bottom: 10px;
+        }
+        
+        .module-description {
+            color: #94a3b8;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        .module-content {
+            display: none;
+            background: #1e293b;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+        
+        .module-content.active {
+            display: block;
+        }
+        
+        .module-content h2 {
+            color: #38bdf8;
+            font-size: 32px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+        }
+        
+        .module-content h3 {
+            color: #38bdf8;
+            font-size: 24px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .module-content p {
+            color: #cbd5e1;
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        
+        /* Nebeneinander-Layout für Code und UML */
+        .split-layout {
+            display: table;
+            width: 100%;
+            margin: 20px 0;
+            table-layout: fixed;
+        }
+        
+        .split-cell-code {
+            display: table-cell;
+            width: 55%;
+            vertical-align: top;
+            padding-right: 20px;
+        }
+        
+        .split-cell-diagram {
+            display: table-cell;
+            width: 45%;
+            vertical-align: top;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.4);
+        }
+        
+        @media (max-width: 850px) {
+            .split-layout, .split-cell-code, .split-cell-diagram {
+                display: block;
+                width: 100%;
+                padding-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Visual Studio Code Dark Highlighting mit Zeilenumbrüchen */
+        .code-block {
+            background: #1e1e1e;
+            color: #dcdcdc;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            border-left: 4px solid #569cd6;
+            overflow-x: auto;
+            line-height: 1.6;
+            font-size: 14px;
+            white-space: pre; /* Behält Zeilenumbrüche zwingend bei */
+        }
+        
+        .code-keyword { color: #569cd6; }
+        .code-type { color: #4ec9b0; }
+        .code-string { color: #d69d85; }
+        .code-comment { color: #57a64a; font-style: italic; }
+        .code-number { color: #b5cea8; }
+        
+        .info-box {
+            background: #0c4a6e;
+            border-left: 5px solid #0ea5e9;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+        
+        .info-box h4 {
+            color: #38bdf8;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .info-box p {
+            color: #e2e8f0;
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+        
+        /* Farbschema für das Quiz bleibt in allen Modulen identisch */
+        .quiz-section {
+            background: #0f172a;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 40px;
+            border: 1px solid #334155;
+        }
+        
+        .quiz-section h3 {
+            color: #e2e8f0;
+            margin-bottom: 20px;
+        }
+        
+        .quiz-question {
+            background: #1e293b;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 2px solid #334155;
+        }
+        
+        .quiz-question.correct {
+            border-color: #22c55e;
+            background: #064e3b;
+        }
+        
+        .quiz-question.wrong {
+            border-color: #ef4444;
+            background: #7f1d1d;
+        }
+        
+        .quiz-question p {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #f8fafc;
+        }
+        
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            background: #334155;
+            transition: background 0.2s, transform 0.1s;
+        }
+        
+        .quiz-option:hover {
+            background: #475569;
+            transform: scale(1.01);
+        }
+        
+        .quiz-option input {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .quiz-option label {
+            cursor: pointer;
+            color: #f1f5f9;
+            width: 100%;
+        }
+        
+        .quiz-feedback {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .quiz-feedback.show {
+            display: block;
+        }
+        
+        .quiz-feedback.correct {
+            background: #10b981;
+            color: white;
+        }
+        
+        .quiz-feedback.wrong {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn {
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            margin-top: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        .btn:hover {
+            background: #0284c7;
+            transform: translateY(-2px);
+        }
+        
+        .btn-back {
+            background: #64748b;
+            margin-right: 10px;
+        }
+        
+        .btn-back:hover {
+            background: #475569;
+        }
+        
+        .badge {
+            display: none;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+        }
+        
+        .badge.show {
+            display: block;
+        }
+        
+        .badge h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+        }
+        
+        .badge-icon {
+            font-size: 80px;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+        
+        ul li, ol li {
+            color: #cbd5e1;
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #1f2937;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid #374151;
+        }
+        
+        th {
+            background: #111827;
+            color: #38bdf8;
+        }
+        
+        tr:nth-child(even) {
+            background: #283548;
+        }
+        
+        /* UML Design via SVG */
+        .uml-class-box {
+            fill: #1e293b;
+            stroke: #38bdf8;
+            stroke-width: 2;
+        }
+        .uml-text {
+            fill: #f8fafc;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+        }
+        .uml-title {
+            font-weight: bold;
+            fill: #38bdf8;
+        }
+        .uml-line {
+            stroke: #334155;
+            stroke-width: 1.5;
+        }
+        .uml-arrow {
+            stroke: #38bdf8;
+            stroke-width: 2;
+            fill: #0f172a;
+        }
+        .uml-arrow-conflict {
+            stroke: #ef4444;
+            stroke-width: 2;
+            fill: #7f1d1d;
+            stroke-dasharray: 4;
+        }
+    
