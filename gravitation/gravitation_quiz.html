@@ -602,7 +602,7 @@
         <div class="header">
             <h1>🍎 Gravitation und Gewichtskraft 🌍</h1>
             <p>Nur die Aufgaben. Testen Sie, was Sie schon können.</p>
-            <div class="book-hint">🧮 Taschenrechner erlaubt &nbsp;·&nbsp; G = 6,674 · 10⁻¹¹ N·m²/kg² &nbsp;·&nbsp; M<sub>Erde</sub> = 5,971 · 10²⁴ kg &nbsp;·&nbsp; g = 9,81 N/kg</div>
+            <div class="book-hint">🧮 Taschenrechner erlaubt &nbsp;·&nbsp; G = 6,674 · 10⁻¹¹ N·m²/kg² &nbsp;·&nbsp; m<sub>Erde</sub> = 5,971 · 10²⁴ kg &nbsp;·&nbsp; g = 9,81 N/kg</div>
         </div>
 
         <div class="progress-bar">
@@ -702,7 +702,7 @@ const modules = {
 // Aufgaben für das Modul "Gravitation und Gewichtskraft" (FOS 12)
 // Hilfsfunktionen aus engine.js. num-Felder: ans in Tausendsteln der Einheit
 // (9,81 -> 9810). tol = erlaubter Spielraum in Tausendsteln.
-// Konstanten wie im Arbeitsblatt: G = 6,674 · 10⁻¹¹ N·m²/kg², M_Erde = 5,971 · 10²⁴ kg
+// Konstanten wie im Arbeitsblatt: G = 6,674 · 10⁻¹¹ N·m²/kg², m_Erde = 5,971 · 10²⁴ kg
 // =====================================================================
 
 const BASIC = [1, 2, 3, 4];
@@ -715,7 +715,7 @@ const UNLOCK_TEXT = {
 
 // ---------- Konstanten ----------
 const G = 6.674e-11, ME = 5.971e24, RE = 6371, g0 = 9.81;
-const KONST = 'G = 6,674 · 10⁻¹¹ N·m²/kg², M<sub>Erde</sub> = 5,971 · 10²⁴ kg';
+const KONST = 'G = 6,674 · 10⁻¹¹ N·m²/kg², m<sub>Erde</sub> = 5,971 · 10²⁴ kg';
 
 // ---------- Zahlen ----------
 const T = x => Math.round(x * 1000);                       // Wert -> Tausendstel
@@ -975,7 +975,7 @@ const TASKS = {
             q: 'Berechnen Sie die Gravitationskraft der Erde auf eine Masse von <strong>' + m + ' kg</strong> an zwei Orten.',
             note: KONST + '. Runden Sie auf <strong>drei</strong> Nachkommastellen. Die Unterschiede sind klein!',
             fields,
-            hint: 'F = G · M<sub>Erde</sub> · m / r². Rechnen Sie r zuerst in m um: ' + orte[0].r + ' km = ' + de(orte[0].r / 1000) + ' · 10⁶ m.',
+            hint: 'F = G · m<sub>Erde</sub> · m / r². Rechnen Sie r zuerst in m um: ' + orte[0].r + ' km = ' + de(orte[0].r / 1000) + ' · 10⁶ m.',
             explanation: orte.map((o, k) => o.name + ': F = 6,674 · 10⁻¹¹ · 5,971 · 10²⁴ · ' + m + ' / (' + de(o.r / 1000) + ' · 10⁶)² N ≈ <strong>' + de(fields[k].ans / 1000, 3) + ' N</strong>').join('<br>') +
                          '<br>Je weiter weg vom Erdmittelpunkt, desto kleiner die Kraft.'
         };
@@ -1022,10 +1022,10 @@ const TASKS = {
     },
     function () {
         const sz = rnd([
-            { t: 'Erde und Mond', d: 'M<sub>Erde</sub> = 5,971 · 10²⁴ kg, M<sub>Mond</sub> = 7,342 · 10²² kg, Abstand r = 384 400 km', F: G * ME * 7.342e22 / Math.pow(3.844e8, 2) },
-            { t: 'Sonne und Erde', d: 'M<sub>Sonne</sub> = 1,989 · 10³⁰ kg, M<sub>Erde</sub> = 5,971 · 10²⁴ kg, Abstand r = 149,6 Mio. km', F: G * 1.989e30 * ME / Math.pow(1.496e11, 2) },
-            { t: 'Erde und Internationale Raumstation ISS', d: 'M<sub>Erde</sub> = 5,971 · 10²⁴ kg, m<sub>ISS</sub> = 4,2 · 10⁵ kg, Abstand zum Erdmittelpunkt r = 6779 km', F: G * ME * 4.2e5 / Math.pow(6.779e6, 2) },
-            { t: 'Erde und einem Lkw', d: 'M<sub>Erde</sub> = 5,971 · 10²⁴ kg, m<sub>Lkw</sub> = 4 · 10⁴ kg, Abstand zum Erdmittelpunkt r = 6373 km', F: G * ME * 4e4 / Math.pow(6.373e6, 2) }
+            { t: 'Erde und Mond', d: 'm<sub>Erde</sub> = 5,971 · 10²⁴ kg, m<sub>Mond</sub> = 7,342 · 10²² kg, Abstand r = 384 400 km', F: G * ME * 7.342e22 / Math.pow(3.844e8, 2) },
+            { t: 'Sonne und Erde', d: 'm<sub>Sonne</sub> = 1,989 · 10³⁰ kg, m<sub>Erde</sub> = 5,971 · 10²⁴ kg, Abstand r = 149,6 Mio. km', F: G * 1.989e30 * ME / Math.pow(1.496e11, 2) },
+            { t: 'Erde und Internationale Raumstation ISS', d: 'm<sub>Erde</sub> = 5,971 · 10²⁴ kg, m<sub>ISS</sub> = 4,2 · 10⁵ kg, Abstand zum Erdmittelpunkt r = 6779 km', F: G * ME * 4.2e5 / Math.pow(6.779e6, 2) },
+            { t: 'Erde und einem Lkw', d: 'm<sub>Erde</sub> = 5,971 · 10²⁴ kg, m<sub>Lkw</sub> = 4 · 10⁴ kg, Abstand zum Erdmittelpunkt r = 6373 km', F: G * ME * 4e4 / Math.pow(6.373e6, 2) }
         ]);
         const s = sci(sz.F, 2);
         return {
@@ -1103,12 +1103,12 @@ const TASKS = {
     ], 5, 'g ist der Ortsfaktor: Kraft pro Kilogramm, auch Fallbeschleunigung genannt. Er ist nicht überall gleich. Im Vakuum fallen alle Körper gleich schnell, weil jedes Kilogramm dieselbe Beschleunigung g erfährt.'),
     {
         type: 'order', q: 'Wie kommt man vom Gravitationsgesetz zur Formel F<sub>G</sub> = m · g? Bringen Sie die Schritte in die richtige Reihenfolge.',
-        steps: ['Gravitationsgesetz für Erde und Körper: F<sub>G</sub> = G · M<sub>Erde</sub> · m / r²',
-                'An einem festen Ort sind G, M<sub>Erde</sub> und r konstant.',
-                'Diese Konstanten fasst man zusammen: g = G · M<sub>Erde</sub> / r²',
+        steps: ['Gravitationsgesetz für Erde und Körper: F<sub>G</sub> = G · m<sub>Erde</sub> · m / r²',
+                'An einem festen Ort sind G, m<sub>Erde</sub> und r konstant.',
+                'Diese Konstanten fasst man zusammen: g = G · m<sub>Erde</sub> / r²',
                 'Damit gilt: F<sub>G</sub> = m · g'],
         hint: 'Starten Sie beim allgemeinen Gesetz. Am Ende steht die kurze Formel.',
-        explanation: 'g = G · M<sub>Erde</sub> / r² ist für jeden Ort eine feste Zahl. In Mitteleuropa ist g ≈ 9,81 N/kg. Deshalb reicht im Alltag F<sub>G</sub> = m · g.'
+        explanation: 'g = G · m<sub>Erde</sub> / r² ist für jeden Ort eine feste Zahl. In Mitteleuropa ist g ≈ 9,81 N/kg. Deshalb reicht im Alltag F<sub>G</sub> = m · g.'
     }
 ],
 // ---------------------------------------------------------------- Modul 5
@@ -1133,7 +1133,7 @@ const TASKS = {
         const s = sci(k.R * 1000, 4), gv = G * k.M / Math.pow(k.R * 1000, 2);
         return {
             type: 'num',
-            q: 'Berechnen Sie den Ortsfaktor g an der Oberfläche von <strong>' + k.name + '</strong>.<br><span style="color:#cbd5e1">M = ' + sciStr(k.M, 3) + ' kg, Radius R = ' + de(k.R) + ' km</span>',
+            q: 'Berechnen Sie den Ortsfaktor g an der Oberfläche von <strong>' + k.name + '</strong>.<br><span style="color:#cbd5e1">Masse m = ' + sciStr(k.M, 3) + ' kg, Radius R = ' + de(k.R) + ' km</span>',
             note: 'Formel: g = G · M / R². G = 6,674 · 10⁻¹¹ N·m²/kg². Runden Sie g auf zwei Nachkommastellen.',
             fields: [
                 { label: 'Radius in m', unit: '· ' + p10(s.n) + ' m', ans: T(s.a), tol: 1, errors: [{ v: T(k.R), msg: 'Die Zahl vor der Zehnerpotenz soll zwischen 1 und 10 liegen.', tol: 0 }] },
@@ -1155,7 +1155,7 @@ const TASKS = {
         correct: 1,
         wrongHints: { 'Auf dem Mond gibt es keine Luft. Ohne Luft gibt es keine Schwerkraft.': 'Gravitation braucht keine Luft. Sie wirkt auch im leeren Weltraum.' },
         hint: 'Schauen Sie auf g = G · M / R². Was steht im Zähler, was im Nenner?',
-        explanation: 'g<sub>Mond</sub> / g<sub>Erde</sub> = (M<sub>Mond</sub> / M<sub>Erde</sub>) / (R<sub>Mond</sub> / R<sub>Erde</sub>)² ≈ (1/81) / 0,27² ≈ 0,17. Also etwa <strong>ein Sechstel</strong>. Die viel kleinere Masse gewinnt gegen den kleineren Radius.'
+        explanation: 'g<sub>Mond</sub> / g<sub>Erde</sub> = (m<sub>Mond</sub> / m<sub>Erde</sub>) / (R<sub>Mond</sub> / R<sub>Erde</sub>)² ≈ (1/81) / 0,27² ≈ 0,17. Also etwa <strong>ein Sechstel</strong>. Die viel kleinere Masse gewinnt gegen den kleineren Radius.'
     },
     function () {
         const all = [
@@ -1255,14 +1255,14 @@ const TASKS = {
         return {
             type: 'num', level: 'Knobelaufgabe',
             q: 'In welchem Abstand vom Erdmittelpunkt ist g ' + z.t + '?',
-            note: KONST + ', Erdradius R = 6371 km. Stellen Sie g = G · M / r² nach r um. Ergebnisse auf ganze km.',
+            note: KONST + ', Erdradius R = 6371 km. Stellen Sie g = G · m<sub>Erde</sub> / r² nach r um. Ergebnisse auf ganze km.',
             fields: [
                 { label: 'Abstand r vom Erdmittelpunkt', unit: 'km', ans: T(r), tol: relTol(r, 0.01),
                   errors: [{ v: T(r * 1000), msg: 'Das Ergebnis der Wurzel ist in m. Rechnen Sie in km um.', tol: relTol(r * 1000, 0.01) }] },
                 { label: 'Höhe über der Erdoberfläche', unit: 'km', ans: T(h), tol: relTol(r, 0.01), errors: [{ v: T(r), msg: 'Gefragt ist die Höhe über der Oberfläche: r − R.', tol: relTol(r, 0.01) }] }
             ],
-            hint: 'r = √(G · M / g). Das Ergebnis kommt in m heraus. Für die Höhe ziehen Sie den Erdradius ab.',
-            explanation: 'r = √(G · M / g) = √(6,674 · 10⁻¹¹ · 5,971 · 10²⁴ / ' + de(z.g, 4) + ') m ≈ <strong>' + de(Math.round(r)) + ' km</strong>. Höhe: ' + de(Math.round(r)) + ' km − 6371 km ≈ <strong>' + de(Math.round(h)) + ' km</strong>.' +
+            hint: 'r = √(G · m<sub>Erde</sub> / g). Das Ergebnis kommt in m heraus. Für die Höhe ziehen Sie den Erdradius ab.',
+            explanation: 'r = √(G · m<sub>Erde</sub> / g) = √(6,674 · 10⁻¹¹ · 5,971 · 10²⁴ / ' + de(z.g, 4) + ') m ≈ <strong>' + de(Math.round(r)) + ' km</strong>. Höhe: ' + de(Math.round(r)) + ' km − 6371 km ≈ <strong>' + de(Math.round(h)) + ' km</strong>.' +
                          (z.g === g0 / 2 ? ' Kurzer Weg: g halbiert sich, wenn r um den Faktor √2 wächst: 6371 km · √2 ≈ 9010 km.' : z.g === g0 / 4 ? ' Kurzer Weg: Ein Viertel bei doppeltem Abstand, also r ≈ 2 · 6371 km.' : '')
         };
     },
@@ -1304,7 +1304,7 @@ const TASKS = {
             note: 'Abstände zum Erdmittelpunkt: ' + sel.map(x => x.name + ': ' + de(x.r) + ' km').join('; ') + '.',
             top: 'größtes g', bottom: 'kleinstes g',
             steps: sel.map(x => x.name),
-            hint: 'g = G · M / r². Je größer der Abstand r zum Erdmittelpunkt, desto kleiner g.',
+            hint: 'g = G · m<sub>Erde</sub> / r². Je größer der Abstand r zum Erdmittelpunkt, desto kleiner g.',
             explanation: sel.map(x => x.name + ': g ≈ <strong>' + de(gAt(x.r), 3) + ' N/kg</strong>').join('<br>')
         };
     },
@@ -1320,7 +1320,7 @@ const TASKS = {
                 { label: 'g in der ISS', unit: 'N/kg', ans: T(gi), tol: 15, errors: [{ v: T(G * ME / Math.pow(h * 1000, 2)), msg: 'Sie haben nur die Höhe eingesetzt. Gemeint ist r = R + h.', tol: relTol(G * ME / Math.pow(h * 1000, 2), 0.01) }] },
                 { label: 'g ist kleiner um', unit: '%', ans: T(p), tol: 400 }
             ],
-            hint: 'Erst r = 6371 km + h. Dann g = G · M / r². Prozent: (1 − g<sub>ISS</sub> / g<sub>Oberfläche</sub>) · 100.',
+            hint: 'Erst r = 6371 km + h. Dann g = G · m<sub>Erde</sub> / r². Prozent: (1 − g<sub>ISS</sub> / g<sub>Oberfläche</sub>) · 100.',
             explanation: 'r = ' + de(r) + ' km. g = 6,674 · 10⁻¹¹ · 5,971 · 10²⁴ / (' + de(r / 1000, 3) + ' · 10⁶)² ≈ <strong>' + de(gi, 2) + ' N/kg</strong>.<br>' +
                          'An der Oberfläche (r = 6371 km): g ≈ ' + de(gs, 2) + ' N/kg. Also ist g in der ISS nur etwa <strong>' + de(p, 1) + ' %</strong> kleiner.'
         };
@@ -1350,7 +1350,7 @@ const TASKS = {
                 { label: 'Gewichtskraft in Jakarta', unit: 'N', ans: T(Fb), tol: 2 * m },
                 { label: 'Unterschied', unit: 'N', ans: T(Fa - Fb), tol: Math.max(3, relTol(Fa - Fb, 0.05)) }
             ],
-            hint: 'Zweimal F = G · M<sub>Erde</sub> · m / r², dann die Differenz.',
+            hint: 'Zweimal F = G · m<sub>Erde</sub> · m / r², dann die Differenz.',
             explanation: 'Nordpol: <strong>' + de(Fa, 3) + ' N</strong>. Jakarta: <strong>' + de(Fb, 3) + ' N</strong>. Unterschied: <strong>' + de(Fa - Fb, 3) + ' N</strong>. Ein Federkraftmesser zeigt diesen Unterschied. Eine Balkenwaage nicht: Sie vergleicht Massen, und die sind überall gleich.'
         };
     },

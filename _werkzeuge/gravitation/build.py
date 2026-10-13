@@ -320,7 +320,7 @@ M[3] = dict(
 {box("🧮 Taschenrechner", "Für Zehnerpotenzen gibt es eine Taste: <strong>EXP</strong>, <strong>EE</strong> oder <strong>×10ˣ</strong>. 6,674 · 10⁻¹¹ tippen Sie so: 6.674 EXP (−) 11. Setzen Sie r² immer in Klammern!")}
 
 <h3>Beispiel: Gravitationskraft auf 1 kg in Nürnberg</h3>
-<p>Gegeben: M<sub>Erde</sub> = 5,971 · 10²⁴ kg, m = 1 kg, r = 6373 km.</p>
+<p>Gegeben: m<sub>Erde</sub> = 5,971 · 10²⁴ kg, m = 1 kg, r = 6373 km.</p>
 {table(["Schritt", "Rechnung"], [
   ["① SI-Einheiten", "r = 6373 km = 6,373 · 10⁶ m"],
   ["② Einsetzen", "F = 6,674 · 10⁻¹¹ · 5,971 · 10²⁴ · 1 / (6,373 · 10⁶)² N"],
@@ -345,10 +345,10 @@ M[4] = dict(
  title="Modul 4: Gewichtskraft und Ortsfaktor g",
  full=f"""
 <h3>Vom Gravitationsgesetz zur Gewichtskraft</h3>
-<p>Für einen Körper auf der Erde gilt das Gravitationsgesetz mit m₁ = M<sub>Erde</sub> und m₂ = m:</p>
-<div class="formula">F<sub>G</sub> = G · {frac("M<sub>Erde</sub> · m", "r²")} = m · <span style="color:#fbbf24">{frac("G · M<sub>Erde</sub>", "r²")}</span></div>
+<p>Für einen Körper auf der Erde gilt das Gravitationsgesetz mit m₁ = m<sub>Erde</sub> und m₂ = m:</p>
+<div class="formula">F<sub>G</sub> = G · {frac("m<sub>Erde</sub> · m", "r²")} = m · <span style="color:#fbbf24">{frac("G · m<sub>Erde</sub>", "r²")}</span></div>
 <p>Der gelbe Teil ist an einem festen Ort immer gleich. Man nennt ihn <strong>Ortsfaktor g</strong>:</p>
-<div class="formula">g = {frac("G · M<sub>Erde</sub>", "r²")} ≈ 9,81 {frac("N", "kg")}</div>
+<div class="formula">g = {frac("G · m<sub>Erde</sub>", "r²")} ≈ 9,81 {frac("N", "kg")}</div>
 <p>Damit wird die Formel ganz kurz:</p>
 {GEWICHT}
 {table(["Zeichen", "Bedeutung", "Einheit"], [
@@ -368,7 +368,7 @@ M[4] = dict(
 """,
  short=f"""
 {GEWICHT}
-<p>g = G · M<sub>Erde</sub> / r² ≈ <strong>9,81 N/kg</strong> (= m/s²). Das ist der Ortsfaktor: die Kraft pro Kilogramm.</p>
+<p>g = G · m<sub>Erde</sub> / r² ≈ <strong>9,81 N/kg</strong> (= m/s²). Das ist der Ortsfaktor: die Kraft pro Kilogramm.</p>
 <p><strong>Beispiel:</strong> 75 kg · 9,81 N/kg ≈ 736 N. &nbsp; <strong>Umgestellt:</strong> m = F<sub>G</sub> / g.</p>
 <p>Massen immer in kg einsetzen.</p>
 """,
@@ -497,7 +497,7 @@ def build(variant):
         data[n] = dict(title=M[n]["title"], content=content)
 
     header_hint = ('<div class="book-hint">🧮 Taschenrechner erlaubt &nbsp;·&nbsp; G = 6,674 · 10⁻¹¹ N·m²/kg² &nbsp;·&nbsp; '
-                   'M<sub>Erde</sub> = 5,971 · 10²⁴ kg &nbsp;·&nbsp; g = 9,81 N/kg</div>')
+                   'm<sub>Erde</sub> = 5,971 · 10²⁴ kg &nbsp;·&nbsp; g = 9,81 N/kg</div>')
     return f'''<!DOCTYPE html>
 <html lang="de">
 <head>
