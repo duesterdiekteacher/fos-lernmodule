@@ -27,7 +27,7 @@ function pickN(arr, n) { return shuffle(arr).slice(0, n); }
 
 function parseNum(s) {
     s = (s || '').trim().replace(/\s+/g, '')
-        .replace(/(N\/kg|m\/s²|m\/s\^2|kN|km|kg|N|m|g|%)$/, '')   // angehängte Einheit ignorieren
+        .replace(/(N\/kg|m\/s²|m\/s\^2|m\/s2|m\/s|km\/h|kN|km|kg|N|m|g|s|%)$/, '')   // angehängte Einheit ignorieren
         .replace(/[−–]/g, '-').replace(',', '.');
     if (!/^[+-]?(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
     return parseFloat(s);

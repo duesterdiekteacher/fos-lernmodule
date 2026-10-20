@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kraft und Beschleunigung – Lernmodul</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #f8fafc;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+        
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            color: #38bdf8;
+        }
+        
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+            color: #cbd5e1;
+        }
+        
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 5px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #0ea5e9, #22c55e);
+            height: 30px;
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+        }
+        
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(350px, 100%), 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .module-card {
+            background: #1e293b;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #334155;
+        }
+        
+        .module-card:hover:not(.locked) {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(56, 189, 248, 0.2);
+            border-color: #38bdf8;
+        }
+        
+        /* Module 5 und 6 farblich dezent abgesetzt (dunkles Indigo) */
+        .module-card.advanced-card {
+            background: #16122c;
+            border-color: #4c1d95;
+        }
+        
+        .module-card.advanced-card:hover:not(.locked) {
+            border-color: #a855f7;
+            box-shadow: 0 8px 15px rgba(168, 85, 247, 0.2);
+        }
+        
+        .module-card.completed {
+            border-color: #22c55e !important;
+        }
+        
+        .module-card.completed::before {
+            content: "✓";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #22c55e;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .module-card.locked {
+            background: #0f111a;
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+        
+        .module-card.locked::before {
+            content: "🔒";
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+        }
+        
+        .module-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .module-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #f1f5f9;
+            margin-bottom: 10px;
+        }
+        
+        .module-description {
+            color: #94a3b8;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        .module-content {
+            display: none;
+            background: #1e293b;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+        
+        .module-content.active {
+            display: block;
+        }
+        
+        .module-content h2 {
+            color: #38bdf8;
+            font-size: 32px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+        }
+        
+        .module-content h3 {
+            color: #38bdf8;
+            font-size: 24px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .module-content p {
+            color: #cbd5e1;
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        
+        /* Nebeneinander-Layout für Code und UML */
+        .split-layout {
+            display: table;
+            width: 100%;
+            margin: 20px 0;
+            table-layout: fixed;
+        }
+        
+        .split-cell-code {
+            display: table-cell;
+            width: 55%;
+            vertical-align: top;
+            padding-right: 20px;
+        }
+        
+        .split-cell-diagram {
+            display: table-cell;
+            width: 45%;
+            vertical-align: top;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.4);
+        }
+        
+        @media (max-width: 850px) {
+            .split-layout, .split-cell-code, .split-cell-diagram {
+                display: block;
+                width: 100%;
+                padding-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Visual Studio Code Dark Highlighting mit Zeilenumbrüchen */
+        .code-block {
+            background: #1e1e1e;
+            color: #dcdcdc;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            border-left: 4px solid #569cd6;
+            overflow-x: auto;
+            line-height: 1.6;
+            font-size: 14px;
+            white-space: pre; /* Behält Zeilenumbrüche zwingend bei */
+        }
+        
+        .code-keyword { color: #569cd6; }
+        .code-type { color: #4ec9b0; }
+        .code-string { color: #d69d85; }
+        .code-comment { color: #57a64a; font-style: italic; }
+        .code-number { color: #b5cea8; }
+        
+        .info-box {
+            background: #0c4a6e;
+            border-left: 5px solid #0ea5e9;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+        
+        .info-box h4 {
+            color: #38bdf8;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .info-box p {
+            color: #e2e8f0;
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+        
+        /* Farbschema für das Quiz bleibt in allen Modulen identisch */
+        .quiz-section {
+            background: #0f172a;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 40px;
+            border: 1px solid #334155;
+        }
+        
+        .quiz-section h3 {
+            color: #e2e8f0;
+            margin-bottom: 20px;
+        }
+        
+        .quiz-question {
+            background: #1e293b;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 2px solid #334155;
+        }
+        
+        .quiz-question.correct {
+            border-color: #22c55e;
+            background: #064e3b;
+        }
+        
+        .quiz-question.wrong {
+            border-color: #ef4444;
+            background: #7f1d1d;
+        }
+        
+        .quiz-question p {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #f8fafc;
+        }
+        
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            background: #334155;
+            transition: background 0.2s, transform 0.1s;
+        }
+        
+        .quiz-option:hover {
+            background: #475569;
+            transform: scale(1.01);
+        }
+        
+        .quiz-option input {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .quiz-option label {
+            cursor: pointer;
+            color: #f1f5f9;
+            width: 100%;
+        }
+        
+        .quiz-feedback {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .quiz-feedback.show {
+            display: block;
+        }
+        
+        .quiz-feedback.correct {
+            background: #10b981;
+            color: white;
+        }
+        
+        .quiz-feedback.wrong {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn {
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            margin-top: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        .btn:hover {
+            background: #0284c7;
+            transform: translateY(-2px);
+        }
+        
+        .btn-back {
+            background: #64748b;
+            margin-right: 10px;
+        }
+        
+        .btn-back:hover {
+            background: #475569;
+        }
+        
+        .badge {
+            display: none;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+        }
+        
+        .badge.show {
+            display: block;
+        }
+        
+        .badge h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+        }
+        
+        .badge-icon {
+            font-size: 80px;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+        
+        ul li, ol li {
+            color: #cbd5e1;
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #1f2937;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid #374151;
+        }
+        
+        th {
+            background: #111827;
+            color: #38bdf8;
+        }
+        
+        tr:nth-child(even) {
+            background: #283548;
+        }
+        
+        /* UML Design via SVG */
+        .uml-class-box {
+            fill: #1e293b;
+            stroke: #38bdf8;
+            stroke-width: 2;
+        }
+        .uml-text {
+            fill: #f8fafc;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+        }
+        .uml-title {
+            font-weight: bold;
+            fill: #38bdf8;
+        }
+        .uml-line {
+            stroke: #334155;
+            stroke-width: 1.5;
+        }
+        .uml-arrow {
+            stroke: #38bdf8;
+            stroke-width: 2;
+            fill: #0f172a;
+        }
+        .uml-arrow-conflict {
+            stroke: #ef4444;
+            stroke-width: 2;
+            fill: #7f1d1d;
+            stroke-dasharray: 4;
+        }
+    
+        .table-wrap { overflow-x: auto; }
+        .table-wrap table { min-width: 420px; }
+        .sketch {
+            text-align: center; margin: 25px 0; background: #0f172a; padding: 20px;
+            border-radius: 10px; border: 2px solid #334155;
+        }
+        .sketch svg { width: 100%; max-width: 560px; height: auto; }
+        .sketch .caption { font-size: 14px; color: #94a3b8; margin: 10px 0 0 0; }
+        .formula {
+            font-family: 'Cambria Math', 'Cambria', 'Times New Roman', serif;
+            background: #0f172a; border: 1px solid #334155; border-radius: 8px;
+            padding: 15px 20px; margin: 15px 0; color: #e2e8f0; font-size: 20px; line-height: 1.9;
+        }
+        .formula.big { text-align: center; font-size: 26px; border-color: #38bdf8; }
+        .formula-grid { display: grid; grid-template-columns: auto auto; gap: 4px 30px; justify-content: center; align-items: center; }
+        .formula-grid .fname { font-family: 'Segoe UI', Arial, sans-serif; font-size: 17px; color: #cbd5e1; }
+        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 4px; }
+        .frac > span:first-child { border-bottom: 2px solid currentColor; padding: 0 4px; }
+        .frac > span:last-child { padding: 0 4px; }
+        .gesetz {
+            background: #0f2a3b; border-left: 5px solid #38bdf8; border-radius: 8px;
+            padding: 16px 20px; margin: 20px 0; color: #e0f2fe; font-size: 18px; line-height: 1.7;
+        }
+        .gesetz strong { color: #7dd3fc; }
+        .ok { color: #4ade80; font-weight: bold; }
+        .nok { color: #f87171; font-weight: bold; }
+        .header .book-hint {
+            display: inline-block; margin-top: 15px; background: #0f2a3b; border: 1px solid #38bdf8;
+            color: #bae6fd; padding: 8px 16px; border-radius: 8px; font-size: 16px; line-height: 1.6;
+        }
+        .progress-fill { min-width: fit-content; padding: 0 14px; white-space: nowrap; }
+        @media (max-width: 600px) {
+            .sketch { overflow-x: auto; padding: 15px 10px; }
+            .sketch svg { min-width: 0; }
+            .module-content { padding: 22px 16px; }
+            .header h1 { font-size: 30px; }
+            .module-content h2 { font-size: 25px; }
+            .formula { font-size: 17px; padding: 12px; overflow-x: auto; }
+            .formula.big { font-size: 21px; }
+            .formula-grid { grid-template-columns: 1fr; gap: 0; }
+            .formula-grid .fname { margin-top: 8px; }
+            .gesetz { font-size: 17px; padding: 12px 14px; }
+        }
+        /* ---------- Aufgabentypen ---------- */
+        .task-head { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .task-type, .task-level {
+            font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+            background: #0f172a; border: 1px solid #475569; color: #cbd5e1;
+        }
+        .task-level { border-color: #a855f7; color: #e9d5ff; background: #2e1a47; }
+        .task-note { color: #94a3b8; font-size: 15px; margin: -5px 0 12px 0; line-height: 1.6; }
+        .quiz-question .sketch { margin: 10px 0 15px 0; }
+        .fields { display: flex; flex-direction: column; gap: 10px; }
+        .field-row {
+            display: grid; grid-template-columns: minmax(150px, 1fr) minmax(170px, 1.3fr);
+            gap: 4px 14px; align-items: center;
+            background: #273449; border: 2px solid transparent; border-radius: 8px; padding: 10px 12px;
+        }
+        .field-row.ok { border-color: #22c55e; }
+        .field-row.bad { border-color: #ef4444; }
+        .field-label { color: #f1f5f9; font-size: 17px; }
+        .field-input { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .field-input input, .field-input select {
+            background: #0f172a; color: #f8fafc; border: 2px solid #475569; border-radius: 6px;
+            font-size: 18px; padding: 8px 10px; font-family: inherit;
+        }
+        .field-input input { width: 9em; font-family: 'Consolas', 'Courier New', monospace; }
+        .field-input input.small { width: 6em; }
+        .field-input select { width: 100%; max-width: 340px; font-size: 16px; }
+        .field-input input:focus, .field-input select:focus { outline: none; border-color: #38bdf8; }
+        .field-input input:disabled, .field-input select:disabled { opacity: 0.85; }
+        .field-pre, .field-unit { color: #cbd5e1; font-size: 17px; }
+        .field-unit:empty { display: none; }
+        .field-msg { grid-column: 1 / -1; color: #fecaca; font-size: 15px; }
+        .field-msg:empty { display: none; }
+        .order-end { color: #94a3b8; font-size: 14px; font-weight: 600; margin: 4px 0 6px 28px; }
+        .order-list { list-style: decimal; margin-left: 28px; }
+        .order-item {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            background: #273449; border: 2px solid transparent; border-radius: 8px;
+            padding: 8px 10px; margin-bottom: 8px; color: #f1f5f9;
+        }
+        .order-item.ok { border-color: #22c55e; }
+        .order-item.bad { border-color: #ef4444; }
+        .order-btns { display: flex; gap: 6px; flex-shrink: 0; }
+        .order-btns button {
+            background: #334155; color: #f8fafc; border: 1px solid #64748b; border-radius: 6px;
+            width: 38px; height: 34px; font-size: 15px; cursor: pointer;
+        }
+        .order-btns button:hover:not(:disabled) { background: #475569; }
+        .order-btns button:disabled { opacity: 0.3; cursor: default; }
+        .task-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+        .btn-check, .btn-new { border: none; border-radius: 8px; padding: 10px 20px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-check { background: #0ea5e9; color: white; }
+        .btn-check:hover { background: #0284c7; }
+        .btn-new { background: #334155; color: #f1f5f9; border: 1px solid #64748b; }
+        .btn-new:hover { background: #475569; }
+        .quiz-feedback { line-height: 1.6; }
+        .calc { text-align: left; font-family: "Segoe UI", Arial, sans-serif; font-size: 17px; color: #e2e8f0; line-height: 2.1; white-space: nowrap; overflow-x: auto; }
+        .calc-nr { display: inline-block; min-width: 4.6em; color: #fbbf24; font-family: "Segoe UI", Arial, sans-serif; font-size: 15px; font-weight: bold; }
+        @media (max-width: 600px) {
+            .field-row { grid-template-columns: 1fr; }
+            .field-input input { width: 100%; max-width: 12em; }
+            .quiz-section { padding: 18px 10px; }
+            .quiz-question { padding: 14px 10px; }
+            .calc { font-size: 15px; white-space: normal; line-height: 1.7; }
+            .calc > div { margin-bottom: 6px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Kraft und Beschleunigung 🏎️</h1>
+            <p>Die drei Newtonschen Gesetze, der freie Fall und der Sportwagen. Lerntexte, Aufgaben und ein Abzeichen am Ende.</p>
+            <div class="book-hint">🧮 Taschenrechner erlaubt &nbsp;·&nbsp; g = 9,81 m/s² &nbsp;·&nbsp; 1 N = 1 kg · m/s² &nbsp;·&nbsp; 1 m/s = 3,6 km/h</div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress" style="width: 0%;">0 von 7 Modulen abgeschlossen</div>
+        </div>
+
+        <!-- MODULE GRID -->
+        <div class="module-grid" id="module-grid">
+            <div class="module-card" id="card-1" onclick="openModule(1)">
+                <div class="module-icon">🚌</div>
+                <div class="module-title">Modul 1: Das Trägheitsgesetz</div>
+                <div class="module-description">Warum kippt man im Bus nach vorn? Das 1. Newtonsche Gesetz.</div>
+            </div>
+
+            <div class="module-card" id="card-2" onclick="openModule(2)">
+                <div class="module-icon">🚀</div>
+                <div class="module-title">Modul 2: Kraft, Masse und Beschleunigung</div>
+                <div class="module-description">Das 2. Newtonsche Gesetz: F = m · a. Rechnen und umstellen.</div>
+            </div>
+
+            <div class="module-card" id="card-3" onclick="openModule(3)">
+                <div class="module-icon">🛹</div>
+                <div class="module-title">Modul 3: Kraft und Gegenkraft</div>
+                <div class="module-description">Das 3. Newtonsche Gesetz: actio = reactio. Und was passiert beim Zusammenstoß?</div>
+            </div>
+
+            <div class="module-card" id="card-4" onclick="openModule(4)">
+                <div class="module-icon">🪶</div>
+                <div class="module-title">Modul 4: Gewichtskraft und freier Fall</div>
+                <div class="module-description">Feder und Bowlingkugel: Warum fallen im Vakuum alle Körper gleich schnell?</div>
+            </div>
+
+            <div class="module-card advanced-card locked" id="card-5" onclick="openModule(5)">
+                <div class="module-icon">📐</div>
+                <div class="module-title">Modul 5: Gleichmäßig beschleunigte Bewegung</div>
+                <div class="module-description">Gesperrt. Schließen Sie zuerst die Module 1 bis 4 ab.</div>
+            </div>
+
+            <div class="module-card advanced-card locked" id="card-6" onclick="openModule(6)">
+                <div class="module-icon">🏎️</div>
+                <div class="module-title">Modul 6: Sportwagen gegen freien Fall</div>
+                <div class="module-description">Gesperrt. Danach vergleichen Sie einen Sportwagen mit dem freien Fall.</div>
+            </div>
+
+            <div class="module-card advanced-card locked" id="card-7" onclick="openModule(7)">
+                <div class="module-icon">📈</div>
+                <div class="module-title">Modul 7: Challenge – Das v-t-Diagramm</div>
+                <div class="module-description">Gesperrt. Die Challenge zum Schluss.</div>
+            </div>
+        </div>
+
+        <!-- MODULE CONTENT SECTIONS -->
+        <div id="module-content-container"></div>
+
+        <!-- BADGE -->
+        <div class="badge" id="badge">
+            <div class="badge-icon">🏅</div>
+            <h2>Herzlichen Glückwunsch!</h2>
+            <p style="font-size: 20px;">Sie haben alle Grundlagen- und Fortgeschrittenen-Module geschafft.</p>
+            <h2 id="expert-title" style="margin-top: 20px; color: #f8fafc;">🚀 NEWTONS GESETZE: BEWEGUNGS-PROFI 🏎️</h2>
+        </div>
+    </div>
+
+    <script>
+const modules = {
+  "1": {
+    "title": "Modul 1: Das Trägheitsgesetz",
+    "content": "\n<h3>Das 1. Newtonsche Gesetz</h3>\n<p>Isaac Newton hat 1687 drei Gesetze der Bewegung veröffentlicht. Das erste lautet in einfachen Worten:</p>\n<div class=\"gesetz\"><strong>1. Newtonsches Gesetz:</strong> Ein Körper bleibt in Ruhe oder bewegt sich gleichförmig geradeaus weiter. Das ändert sich nur, wenn eine äußere Kraft auf ihn wirkt.</div>\n<p>Man nennt es auch das <strong>Trägheitsgesetz</strong>. Jeder Körper ist „träge“: Er will seinen Bewegungszustand beibehalten.</p>\n\n<h3>Was ist der Bewegungszustand?</h3>\n<p>Der Bewegungszustand ist die <strong>Geschwindigkeit</strong> mit <strong>Betrag</strong> (wie schnell?) und <strong>Richtung</strong> (wohin?). Er ändert sich, wenn ein Körper …</p>\n<ul>\n<li>schneller wird (anfahren),</li>\n<li>langsamer wird (bremsen),</li>\n<li>die Richtung ändert (Kurve), auch bei gleichem Tempo.</li>\n</ul>\n<p>Für jede dieser Änderungen braucht man eine Kraft. Je größer die <strong>Masse</strong>, desto träger ist der Körper. Ein voller Einkaufswagen ist schwerer anzuschieben als ein leerer.</p>\n\n<h3>Trägheit im Alltag</h3>\n<div class=\"table-wrap\"><table><tr><th>Situation</th><th>Was passiert?</th><th>Warum?</th></tr><tr><td>Bus bremst stark</td><td>Fahrgäste kippen nach vorn</td><td>Der Körper will mit der alten Geschwindigkeit weiterfahren.</td></tr><tr><td>Bus fährt ruckartig an</td><td>Fahrgäste kippen nach hinten</td><td>Der Körper will in Ruhe bleiben.</td></tr><tr><td>Auto fährt schnell in eine Kurve</td><td>Man wird nach außen gedrückt</td><td>Der Körper will geradeaus weiter.</td></tr><tr><td>Unfall mit Sicherheitsgurt</td><td>Der Gurt hält den Körper fest</td><td>Ohne Gurt würde der Körper weiterfliegen.</td></tr></table></div>\n\n<h3>Wichtig: Bewegung braucht keine Kraft</h3>\n<p>Viele denken: „Ohne Kraft bleibt alles stehen.“ Das stimmt nicht. Auf der Erde bremsen nur Reibung und Luftwiderstand. Im Weltraum fliegt eine Raumsonde ohne Antrieb einfach immer weiter.</p>\n<p>Ein Auto fährt mit konstant 100 km/h. Der Motor treibt an, aber Luft und Reibung bremsen genauso stark. Die Kräfte heben sich auf. Das nennt man <strong>Kräftegleichgewicht</strong>.</p>\n\n<div class=\"sketch\">\n<svg viewBox=\"0 0 560 200\" role=\"img\" aria-label=\"Auto mit gleich großer Antriebskraft nach vorn und Widerstandskraft nach hinten\">\n  <defs><marker id=\"pa\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"context-stroke\"/></marker></defs>\n  <rect x=\"200\" y=\"80\" width=\"170\" height=\"50\" rx=\"10\" fill=\"#1e3a5f\" stroke=\"#38bdf8\" stroke-width=\"3\"/>\n  <path d=\"M235,80 L260,48 L325,48 L345,80 Z\" fill=\"#1e3a5f\" stroke=\"#38bdf8\" stroke-width=\"3\"/>\n  <circle cx=\"240\" cy=\"132\" r=\"18\" fill=\"#0f172a\" stroke=\"#94a3b8\" stroke-width=\"3\"/>\n  <circle cx=\"330\" cy=\"132\" r=\"18\" fill=\"#0f172a\" stroke=\"#94a3b8\" stroke-width=\"3\"/>\n  <line x1=\"40\" y1=\"170\" x2=\"520\" y2=\"170\" stroke=\"#475569\" stroke-width=\"2\"/>\n  <line x1=\"375\" y1=\"100\" x2=\"505\" y2=\"100\" stroke=\"#4ade80\" stroke-width=\"5\" marker-end=\"url(#pa)\"/>\n  <text x=\"440\" y=\"88\" fill=\"#4ade80\" font-size=\"16\" font-weight=\"bold\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">Antriebskraft</text>\n  <line x1=\"195\" y1=\"100\" x2=\"65\" y2=\"100\" stroke=\"#f87171\" stroke-width=\"5\" marker-end=\"url(#pa)\"/>\n  <text x=\"130\" y=\"88\" fill=\"#f87171\" font-size=\"16\" font-weight=\"bold\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">Widerstandskraft</text>\n  <text x=\"285\" y=\"194\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">v = 100 km/h, konstant</text>\n</svg>\n<p class=\"caption\">Beide Kräfte sind gleich groß. Die resultierende Kraft ist null. Die Geschwindigkeit bleibt gleich.</p>\n</div>\n\n<div class=\"info-box\"><h4>🧠 Merke</h4><p>Nicht die Bewegung braucht eine Kraft, sondern die <strong>Änderung</strong> der Bewegung. Heben sich alle Kräfte auf, ist die <strong>resultierende Kraft</strong> null. Dann bleibt der Bewegungszustand gleich.</p></div>\n"
+  },
+  "2": {
+    "title": "Modul 2: Kraft, Masse und Beschleunigung",
+    "content": "\n<h3>Das 2. Newtonsche Gesetz</h3>\n<div class=\"gesetz\"><strong>2. Newtonsches Gesetz:</strong> Wirkt eine Kraft auf einen Körper, wird er in Richtung der Kraft beschleunigt. Die Beschleunigung ist proportional zur Kraft und umgekehrt proportional zur Masse.</div>\n<p>Als Formel ist das ganz kurz:</p>\n<div class=\"formula big\">F = m · a</div>\n<div class=\"table-wrap\"><table><tr><th>Zeichen</th><th>Bedeutung</th><th>Einheit</th></tr><tr><td>F</td><td>Kraft (genauer: resultierende Kraft)</td><td>N (Newton)</td></tr><tr><td>m</td><td>Masse des Körpers</td><td>kg</td></tr><tr><td>a</td><td>Beschleunigung</td><td>m/s²</td></tr></table></div>\n\n<h3>Was bedeutet das?</h3>\n<ul>\n<li><strong>Doppelte Kraft</strong> → doppelte Beschleunigung. a ist proportional zu F.</li>\n<li><strong>Doppelte Masse</strong> → halbe Beschleunigung. a ist umgekehrt proportional zu m.</li>\n</ul>\n<div class=\"table-wrap\"><table><tr><th>Änderung</th><th>neue Beschleunigung</th></tr><tr><td>F verdoppelt</td><td>2 · a</td></tr><tr><td>m verdoppelt</td><td>a / 2</td></tr><tr><td>F und m verdoppelt</td><td>a (bleibt gleich)</td></tr><tr><td>m halbiert</td><td>2 · a</td></tr></table></div>\n\n<h3>Die Einheit Newton</h3>\n<p>Aus F = m · a folgt: <strong>1 N = 1 kg · m/s²</strong>. Eine Kraft von 1 N beschleunigt einen Körper mit 1 kg mit 1 m/s². Seine Geschwindigkeit steigt also jede Sekunde um 1 m/s.</p>\n\n<h3>Umstellen</h3>\n<div class=\"formula\">a = <span class=\"frac\"><span>F</span><span>m</span></span> &nbsp;&nbsp;&nbsp;&nbsp; m = <span class=\"frac\"><span>F</span><span>a</span></span></div>\n\n<h3>Beispiel</h3>\n<p>Ein Kleinwagen (m = 1000 kg) beschleunigt mit a = 2 m/s². Welche Kraft ist nötig?</p>\n<div class=\"formula\">F = m · a = 1000 kg · 2 m/s² = 2000 N = 2 kN</div>\n<div class=\"info-box\"><h4>⚠️ Typische Fehler</h4><p>Massen in <strong>kg</strong> einsetzen: 1,2 t = 1200 kg, 500 g = 0,5 kg. Kräfte in <strong>N</strong>: 3 kN = 3000 N.</p></div>\n<div class=\"info-box\"><h4>💡 Resultierende Kraft</h4><p>F ist die Summe aller Kräfte. Treibt ein Motor mit 3000 N an und bremst die Luft mit 800 N, dann ist F = 3000 N − 800 N = 2200 N.</p></div>\n"
+  },
+  "3": {
+    "title": "Modul 3: Kraft und Gegenkraft",
+    "content": "\n<h3>Das 3. Newtonsche Gesetz</h3>\n<div class=\"gesetz\"><strong>3. Newtonsches Gesetz:</strong> Übt Körper 1 eine Kraft auf Körper 2 aus, dann übt Körper 2 eine gleich große, entgegengesetzte Kraft auf Körper 1 aus.</div>\n<p>Kurz: <strong>actio = reactio</strong> (Wirkung = Gegenwirkung). Kräfte treten also immer <strong>paarweise</strong> auf.</p>\n\n<div class=\"sketch\">\n<svg viewBox=\"0 0 560 230\" role=\"img\" aria-label=\"Zwei Personen auf Skateboards stoßen sich voneinander ab\">\n  <defs><marker id=\"ps\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"context-stroke\"/></marker></defs>\n  <circle cx=\"230\" cy=\"45\" r=\"18\" fill=\"#1e3a5f\" stroke=\"#38bdf8\" stroke-width=\"3\"/>\n  <rect x=\"210\" y=\"66\" width=\"40\" height=\"80\" rx=\"10\" fill=\"#1e3a5f\" stroke=\"#38bdf8\" stroke-width=\"3\"/>\n  <line x1=\"250\" y1=\"90\" x2=\"278\" y2=\"90\" stroke=\"#38bdf8\" stroke-width=\"6\" stroke-linecap=\"round\"/>\n  <rect x=\"195\" y=\"150\" width=\"70\" height=\"8\" rx=\"4\" fill=\"#94a3b8\"/>\n  <circle cx=\"207\" cy=\"164\" r=\"6\" fill=\"#94a3b8\"/><circle cx=\"253\" cy=\"164\" r=\"6\" fill=\"#94a3b8\"/>\n  <circle cx=\"330\" cy=\"40\" r=\"20\" fill=\"#3b2a0a\" stroke=\"#f59e0b\" stroke-width=\"3\"/>\n  <rect x=\"306\" y=\"63\" width=\"48\" height=\"83\" rx=\"10\" fill=\"#3b2a0a\" stroke=\"#f59e0b\" stroke-width=\"3\"/>\n  <line x1=\"306\" y1=\"90\" x2=\"282\" y2=\"90\" stroke=\"#f59e0b\" stroke-width=\"6\" stroke-linecap=\"round\"/>\n  <rect x=\"295\" y=\"150\" width=\"70\" height=\"8\" rx=\"4\" fill=\"#94a3b8\"/>\n  <circle cx=\"307\" cy=\"164\" r=\"6\" fill=\"#94a3b8\"/><circle cx=\"353\" cy=\"164\" r=\"6\" fill=\"#94a3b8\"/>\n  <line x1=\"40\" y1=\"172\" x2=\"520\" y2=\"172\" stroke=\"#475569\" stroke-width=\"2\"/>\n  <line x1=\"195\" y1=\"110\" x2=\"95\" y2=\"110\" stroke=\"#f87171\" stroke-width=\"5\" marker-end=\"url(#ps)\"/>\n  <line x1=\"365\" y1=\"110\" x2=\"465\" y2=\"110\" stroke=\"#f87171\" stroke-width=\"5\" marker-end=\"url(#ps)\"/>\n  <text x=\"140\" y=\"98\" fill=\"#f87171\" font-size=\"16\" font-weight=\"bold\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">F₂₁</text>\n  <text x=\"420\" y=\"98\" fill=\"#f87171\" font-size=\"16\" font-weight=\"bold\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">F₁₂</text>\n  <text x=\"230\" y=\"200\" fill=\"#38bdf8\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">Person 1: 50 kg</text>\n  <text x=\"330\" y=\"200\" fill=\"#f59e0b\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">Person 2: 75 kg</text>\n  <text x=\"140\" y=\"140\" fill=\"#cbd5e1\" font-size=\"14\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">a = 2,4 m/s²</text>\n  <text x=\"420\" y=\"140\" fill=\"#cbd5e1\" font-size=\"14\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">a = 1,6 m/s²</text>\n</svg>\n<p class=\"caption\">Person 1 drückt auf Person 2 (F₁₂). Person 2 drückt gleich stark zurück (F₂₁). Beide rollen auseinander. Die leichtere Person wird stärker beschleunigt.</p>\n</div>\n\n\n<h3>Beispiele</h3>\n<div class=\"table-wrap\"><table><tr><th>Kraft</th><th>Gegenkraft</th></tr><tr><td>Die Hand drückt gegen die Wand.</td><td>Die Wand drückt gegen die Hand.</td></tr><tr><td>Die Erde zieht den Apfel an.</td><td>Der Apfel zieht die Erde an.</td></tr><tr><td>Die Rakete stößt Gas nach hinten.</td><td>Das Gas drückt die Rakete nach vorn.</td></tr><tr><td>Der Fuß drückt den Boden nach hinten.</td><td>Der Boden drückt den Fuß nach vorn. So kann man gehen.</td></tr></table></div>\n\n<h3>Gleiche Kraft, verschiedene Wirkung</h3>\n<p>Kraft und Gegenkraft sind gleich groß. Die <strong>Wirkung</strong> kann aber sehr verschieden sein. Das zeigt das 2. Gesetz: a = F / m.</p>\n<p>Beispiel: Ein Pkw (1200 kg) und ein Lkw (12 000 kg) stoßen zusammen. Beide erfahren eine Kraft von 24 000 N.</p>\n<div class=\"table-wrap\"><table><tr><th></th><th>Pkw</th><th>Lkw</th></tr><tr><td>Kraft</td><td>24 000 N</td><td>24 000 N</td></tr><tr><td>Masse</td><td>1200 kg</td><td>12 000 kg</td></tr><tr><td>Beschleunigung a = F / m</td><td>20 m/s²</td><td>2 m/s²</td></tr></table></div>\n<p>Der Pkw wird zehnmal so stark abgebremst. Deshalb sind die Insassen im Pkw stärker gefährdet.</p>\n\n<h3>Achtung: Nicht verwechseln!</h3>\n<p>Kraft und Gegenkraft wirken auf <strong>zwei verschiedene Körper</strong>. Deshalb heben sie sich nicht auf.</p>\n<p>Beim <strong>Kräftegleichgewicht</strong> wirken zwei Kräfte auf <strong>denselben</strong> Körper. Beispiel: Ein Buch liegt auf dem Tisch. Die Gewichtskraft zieht es nach unten. Der Tisch drückt es nach oben. Beide Kräfte wirken auf das Buch.</p>\n<div class=\"table-wrap\"><table><tr><th></th><th>Kraft und Gegenkraft</th><th>Kräftegleichgewicht</th></tr><tr><td>Gesetz</td><td>3. Newtonsches Gesetz</td><td>1. Newtonsches Gesetz</td></tr><tr><td>Angriff</td><td>an zwei verschiedenen Körpern</td><td>am selben Körper</td></tr><tr><td>Heben sich auf?</td><td><span class='nok'>Nein</span></td><td><span class='ok'>Ja</span></td></tr></table></div>\n"
+  },
+  "4": {
+    "title": "Modul 4: Gewichtskraft und freier Fall",
+    "content": "\n<h3>Die Gewichtskraft</h3>\n<p>Die Erde zieht jeden Körper nach unten. Diese Kraft ist die <strong>Gewichtskraft</strong>:</p>\n<div class=\"formula big\">F<sub>G</sub> = m · g &nbsp;&nbsp; mit g = 9,81 m/s²</div>\n<p>Das ist das 2. Newtonsche Gesetz F = m · a. Die Beschleunigung ist hier die <strong>Fallbeschleunigung g</strong>.</p>\n\n<h3>Beispiel: Tischtennisball und Medizinball</h3>\n<div class=\"table-wrap\"><table><tr><th></th><th>Tischtennisball</th><th>Medizinball</th></tr><tr><td>Masse</td><td>2,7 g = 0,0027 kg</td><td>3 kg</td></tr><tr><td>Gewichtskraft F<sub>G</sub> = m · g</td><td>0,0027 kg · 9,81 m/s² ≈ 0,026 N</td><td>3 kg · 9,81 m/s² = 29,43 N</td></tr><tr><td>Beschleunigung a = F<sub>G</sub> / m</td><td>0,026487 N / 0,0027 kg = 9,81 m/s²</td><td>29,43 N / 3 kg = 9,81 m/s²</td></tr></table></div>\n<p>Der Medizinball wird über 1000-mal so stark angezogen. Trotzdem ist die Beschleunigung <strong>genau gleich</strong>.</p>\n\n<h3>Warum fallen alle Körper gleich schnell?</h3>\n<p>Ein schwerer Körper wird stärker angezogen. Er ist aber auch träger. Beides wächst im gleichen Verhältnis:</p>\n<div class=\"formula\">a = <span class=\"frac\"><span>F<sub>G</sub></span><span>m</span></span> = <span class=\"frac\"><span>m · g</span><span>m</span></span> = g</div>\n<p>Die Masse kürzt sich heraus. Ohne Luft fallen deshalb <strong>alle Körper gleich schnell</strong>.</p>\n\n<div class=\"sketch\">\n<svg viewBox=\"0 0 560 290\" role=\"img\" aria-label=\"Zwei Fallrohre: mit Luft fällt die Feder langsamer, im Vakuum fallen Feder und Kugel gleich\">\n  <rect x=\"110\" y=\"30\" width=\"110\" height=\"230\" rx=\"12\" fill=\"none\" stroke=\"#94a3b8\" stroke-width=\"3\"/>\n  <rect x=\"340\" y=\"30\" width=\"110\" height=\"230\" rx=\"12\" fill=\"none\" stroke=\"#94a3b8\" stroke-width=\"3\"/>\n  <text x=\"165\" y=\"22\" fill=\"#cbd5e1\" font-size=\"16\" font-weight=\"bold\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">mit Luft</text>\n  <text x=\"395\" y=\"22\" fill=\"#cbd5e1\" font-size=\"16\" font-weight=\"bold\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">Vakuum</text>\n  <circle cx=\"190\" cy=\"205\" r=\"16\" fill=\"#3b2a0a\" stroke=\"#f59e0b\" stroke-width=\"3\"/>\n  <ellipse cx=\"140\" cy=\"95\" rx=\"9\" ry=\"24\" fill=\"#e2e8f0\" transform=\"rotate(25 140 95)\"/>\n  <line x1=\"129\" y1=\"117\" x2=\"151\" y2=\"73\" stroke=\"#94a3b8\" stroke-width=\"2\"/>\n  <circle cx=\"420\" cy=\"205\" r=\"16\" fill=\"#3b2a0a\" stroke=\"#f59e0b\" stroke-width=\"3\"/>\n  <ellipse cx=\"370\" cy=\"205\" rx=\"9\" ry=\"24\" fill=\"#e2e8f0\" transform=\"rotate(25 370 205)\"/>\n  <line x1=\"359\" y1=\"227\" x2=\"381\" y2=\"183\" stroke=\"#94a3b8\" stroke-width=\"2\"/>\n  <line x1=\"345\" y1=\"205\" x2=\"445\" y2=\"205\" stroke=\"#4ade80\" stroke-width=\"1.5\" stroke-dasharray=\"5 4\"/>\n  <text x=\"280\" y=\"285\" fill=\"#cbd5e1\" font-size=\"14\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">Beide Rohre: Feder und Kugel wurden gleichzeitig losgelassen.</text>\n</svg>\n<p class=\"caption\">Mit Luft bremst der Luftwiderstand die Feder stark. Im Vakuum gibt es keinen Luftwiderstand: Beide fallen gleich schnell.</p>\n</div>\n\n<p>In der Luft gibt es zusätzlich den <strong>Luftwiderstand</strong>. Bei einer Feder ist er im Vergleich zur winzigen Gewichtskraft sehr groß. Deshalb segelt die Feder langsam zu Boden.</p>\n<div class=\"info-box\"><h4>🌙 Versuch auf dem Mond</h4><p>1971 ließ ein Astronaut der Apollo-15-Mission auf dem Mond einen Hammer und eine Feder gleichzeitig fallen. Auf dem Mond gibt es keine Luft. Beide kamen gleichzeitig am Boden an.</p></div>\n<div class=\"info-box\"><h4>🧠 Was bedeutet g = 9,81 m/s²?</h4><p>Beim freien Fall steigt die Geschwindigkeit <strong>jede Sekunde um 9,81 m/s</strong>. Nach 1 s: 9,81 m/s. Nach 2 s: 19,62 m/s. Nach 3 s: 29,43 m/s (über 100 km/h).</p></div>\n"
+  },
+  "5": {
+    "title": "Modul 5: Gleichmäßig beschleunigte Bewegung",
+    "content": "\n<h3>Konstante Beschleunigung</h3>\n<p>Sie haben das Fortgeschrittenen-Modul freigeschaltet! Wirkt eine konstante Kraft, ist auch die Beschleunigung konstant. Die Geschwindigkeit steigt dann jede Sekunde um denselben Betrag. Das nennt man eine <strong>gleichmäßig beschleunigte Bewegung</strong>.</p>\n<div class=\"formula\"><div class=\"formula-grid\">\n<span class=\"fname\">Zeit-Ort-Gesetz:</span><span>x(t) = v₀ · t + ½ · a · t²</span>\n<span class=\"fname\">Zeit-Geschwindigkeit-Gesetz:</span><span>v(t) = v₀ + a · t</span>\n<span class=\"fname\">Beschleunigung:</span><span>a = <span class=\"frac\"><span>Δv</span><span>Δt</span></span></span>\n</div></div>\n<div class=\"table-wrap\"><table><tr><th>Zeichen</th><th>Bedeutung</th><th>Einheit</th></tr><tr><td>x</td><td>zurückgelegter Weg (Ort)</td><td>m</td></tr><tr><td>v₀</td><td>Anfangsgeschwindigkeit</td><td>m/s</td></tr><tr><td>v</td><td>Geschwindigkeit zur Zeit t</td><td>m/s</td></tr><tr><td>t</td><td>Zeit</td><td>s</td></tr><tr><td>a</td><td>Beschleunigung</td><td>m/s²</td></tr></table></div>\n\n<h3>km/h und m/s</h3>\n<p>In den Formeln brauchen Sie <strong>m/s</strong>. Geschwindigkeiten stehen aber oft in km/h.</p>\n<div class=\"formula\">1 m/s = 3,6 km/h &nbsp;&nbsp;&nbsp; km/h <strong>: 3,6</strong> → m/s &nbsp;&nbsp;&nbsp; m/s <strong>· 3,6</strong> → km/h</div>\n<p>Beispiel: 100 km/h : 3,6 ≈ 27,78 m/s. 10 m/s · 3,6 = 36 km/h.</p>\n\n<h3>Beispiel</h3>\n<p>Ein Zug fährt aus dem Stand an (v₀ = 0). Er beschleunigt 20 s lang mit a = 0,5 m/s².</p>\n<div class=\"table-wrap\"><table><tr><th>Gesucht</th><th>Rechnung</th></tr><tr><td>Geschwindigkeit nach 20 s</td><td>v = 0 + 0,5 m/s² · 20 s = 10 m/s = 36 km/h</td></tr><tr><td>Strecke nach 20 s</td><td>x = 0 + ½ · 0,5 m/s² · (20 s)² = ½ · 0,5 · 400 m = 100 m</td></tr></table></div>\n<div class=\"info-box\"><h4>💡 Sonderfall v₀ = 0</h4><p>Startet der Körper aus der Ruhe, werden die Formeln kürzer: v = a · t und x = ½ · a · t².</p></div>\n<div class=\"info-box\"><h4>⚠️ Typische Fehler</h4><p>Das <strong>½</strong> vergessen. Das <strong>t²</strong> nicht quadrieren. km/h nicht in <strong>m/s</strong> umrechnen. Beim Bremsen ist a negativ.</p></div>\n"
+  },
+  "6": {
+    "title": "Modul 6: Sportwagen gegen freien Fall",
+    "content": "\n<h3>Wie stark beschleunigt ein Fahrzeug?</h3>\n<p>Für Autos gibt man oft an: „von 0 auf 100 km/h in … Sekunden“. Daraus berechnen Sie die Beschleunigung mit a = Δv / Δt. Danach können Sie sie mit dem freien Fall vergleichen.</p>\n\n<h3>Beispiel: Motorrad</h3>\n<p>Ein Motorrad beschleunigt in 3,5 s von 0 auf 100 km/h.</p>\n<div class=\"table-wrap\"><table><tr><th>Schritt</th><th>Rechnung</th></tr><tr><td>① Umrechnen</td><td>Δv = 100 km/h : 3,6 ≈ 27,78 m/s</td></tr><tr><td>② Beschleunigung</td><td>a = Δv / Δt = 27,78 m/s / 3,5 s ≈ 7,94 m/s²</td></tr><tr><td>③ Vergleich mit g</td><td>a / g = 7,94 / 9,81 ≈ 0,81 → etwa 81 % der Fallbeschleunigung</td></tr><tr><td>④ Strecke Motorrad</td><td>x = ½ · 7,94 m/s² · (3,5 s)² ≈ 48,6 m</td></tr><tr><td>⑤ Strecke freier Fall</td><td>x = ½ · 9,81 m/s² · (3,5 s)² ≈ 60,1 m</td></tr></table></div>\n<div class=\"info-box\"><h4>💡 Schneller Weg für die Strecke</h4><p>Startet der Körper aus der Ruhe, gilt auch: x = ½ · v · t. Für das Motorrad: ½ · 27,78 m/s · 3,5 s ≈ 48,6 m.</p></div>\n\n<h3>Und die Kraft?</h3>\n<p>Mit dem 2. Newtonschen Gesetz können Sie ausrechnen, welche Kraft dafür nötig ist. Das Motorrad wiegt mit Fahrer 280 kg:</p>\n<div class=\"formula\">F = m · a = 280 kg · 7,94 m/s² ≈ 2223 N</div>\n<p>Dabei sind Luftwiderstand und Reibung nicht berücksichtigt. In Wirklichkeit muss der Motor mehr leisten.</p>\n\n<h3>Strecken vergleichen</h3>\n<p>Starten zwei Körper aus der Ruhe, gilt für beide x = ½ · a · t². Bei gleicher Zeit sind ½ und t² gleich. Dann gilt:</p>\n<div class=\"formula\"><span class=\"frac\"><span>x<sub>1</sub></span><span>x<sub>2</sub></span></span> = <span class=\"frac\"><span>a<sub>1</sub></span><span>a<sub>2</sub></span></span></div>\n<p>Doppelte Beschleunigung bedeutet in derselben Zeit doppelte Strecke.</p>\n"
+  },
+  "7": {
+    "title": "Modul 7: Challenge – Das v-t-Diagramm",
+    "content": "\n<h3>Bewegungen zeichnen</h3>\n<p>Im <strong>Zeit-Geschwindigkeit-Diagramm</strong> (v-t-Diagramm) steht die Zeit t auf der x-Achse. Die Geschwindigkeit v steht auf der y-Achse. Jede Bewegung ergibt eine Linie.</p>\n<div class=\"sketch\"><svg viewBox=\"0 0 540 310\" role=\"img\" aria-label=\"v-t-Diagramm mit drei Bewegungen\"><line x1=\"64\" y1=\"239.2\" x2=\"484.0\" y2=\"239.2\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"216.4\" x2=\"484.0\" y2=\"216.4\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"193.6\" x2=\"484.0\" y2=\"193.6\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"170.8\" x2=\"484.0\" y2=\"170.8\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"148.0\" x2=\"484.0\" y2=\"148.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"125.2\" x2=\"484.0\" y2=\"125.2\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"102.4\" x2=\"484.0\" y2=\"102.4\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"79.6\" x2=\"484.0\" y2=\"79.6\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"56.8\" x2=\"484.0\" y2=\"56.8\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"34.0\" x2=\"484.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"148.0\" y1=\"262\" x2=\"148.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"232.0\" y1=\"262\" x2=\"232.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"316.0\" y1=\"262\" x2=\"316.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"400.0\" y1=\"262\" x2=\"400.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"484.0\" y1=\"262\" x2=\"484.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"262\" x2=\"506.0\" y2=\"262\" stroke=\"#94a3b8\" stroke-width=\"2\"/><line x1=\"64\" y1=\"262\" x2=\"64\" y2=\"16.0\" stroke=\"#94a3b8\" stroke-width=\"2\"/><text x=\"64.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">0</text><text x=\"148.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">1</text><text x=\"232.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">2</text><text x=\"316.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">3</text><text x=\"400.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">4</text><text x=\"484.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">5</text><text x=\"56\" y=\"221.4\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">10</text><text x=\"56\" y=\"175.8\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">20</text><text x=\"56\" y=\"130.2\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">30</text><text x=\"56\" y=\"84.6\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">40</text><text x=\"56\" y=\"39.0\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">50</text><text x=\"506.0\" y=\"304\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">t in s</text><text x=\"72\" y=\"28.0\" fill=\"#cbd5e1\" font-size=\"15\" font-family=\"Segoe UI, Arial\">v in m/s</text><polyline points=\"64.0,262.0 484.0,79.6\" fill=\"none\" stroke=\"#f59e0b\" stroke-width=\"3.5\"/><text x=\"474.0\" y=\"69.6\" fill=\"#f59e0b\" font-size=\"16\" font-weight=\"bold\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">Motorrad</text><polyline points=\"64.0,193.6 484.0,193.6\" fill=\"none\" stroke=\"#4ade80\" stroke-width=\"3.5\"/><text x=\"74.0\" y=\"183.6\" fill=\"#4ade80\" font-size=\"16\" font-weight=\"bold\" text-anchor=\"start\" font-family=\"Segoe UI, Arial\">Auto, konstant</text><polyline points=\"64.0,262.0 484.0,216.4\" fill=\"none\" stroke=\"#38bdf8\" stroke-width=\"3.5\"/><text x=\"474.0\" y=\"206.4\" fill=\"#38bdf8\" font-size=\"16\" font-weight=\"bold\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">Lkw</text></svg><p class=\"caption\">Motorrad: steile Gerade, große Beschleunigung. Lkw: flache Gerade, kleine Beschleunigung. Auto: waagerecht, konstante Geschwindigkeit.</p></div>\n<div class=\"table-wrap\"><table><tr><th>Form der Linie</th><th>Bedeutung</th></tr><tr><td>steigende Gerade</td><td>gleichmäßig schneller werden (a > 0)</td></tr><tr><td>steilere Gerade</td><td>größere Beschleunigung</td></tr><tr><td>waagerechte Linie</td><td>konstante Geschwindigkeit (a = 0)</td></tr><tr><td>fallende Gerade</td><td>gleichmäßig langsamer werden (a < 0)</td></tr><tr><td>Linie bei v = 0</td><td>Stillstand</td></tr></table></div>\n\n<h3>Die Steigung ist die Beschleunigung</h3>\n<p>Zeichnen Sie ein <strong>Steigungsdreieck</strong>. Lesen Sie Δt und Δv ab. Dann gilt a = Δv / Δt.</p>\n<div class=\"sketch\"><svg viewBox=\"0 0 540 310\" role=\"img\" aria-label=\"v-t-Diagramm mit Steigungsdreieck und Fläche unter der Geraden\"><line x1=\"64\" y1=\"239.2\" x2=\"484.0\" y2=\"239.2\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"216.4\" x2=\"484.0\" y2=\"216.4\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"193.6\" x2=\"484.0\" y2=\"193.6\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"170.8\" x2=\"484.0\" y2=\"170.8\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"148.0\" x2=\"484.0\" y2=\"148.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"125.2\" x2=\"484.0\" y2=\"125.2\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"102.4\" x2=\"484.0\" y2=\"102.4\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"79.6\" x2=\"484.0\" y2=\"79.6\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"56.8\" x2=\"484.0\" y2=\"56.8\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"34.0\" x2=\"484.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"148.0\" y1=\"262\" x2=\"148.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"232.0\" y1=\"262\" x2=\"232.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"316.0\" y1=\"262\" x2=\"316.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"400.0\" y1=\"262\" x2=\"400.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"484.0\" y1=\"262\" x2=\"484.0\" y2=\"34.0\" stroke=\"#334155\" stroke-width=\"1\"/><line x1=\"64\" y1=\"262\" x2=\"506.0\" y2=\"262\" stroke=\"#94a3b8\" stroke-width=\"2\"/><line x1=\"64\" y1=\"262\" x2=\"64\" y2=\"16.0\" stroke=\"#94a3b8\" stroke-width=\"2\"/><text x=\"64.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">0</text><text x=\"148.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">1</text><text x=\"232.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">2</text><text x=\"316.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">3</text><text x=\"400.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">4</text><text x=\"484.0\" y=\"284\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">5</text><text x=\"56\" y=\"221.4\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">10</text><text x=\"56\" y=\"175.8\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">20</text><text x=\"56\" y=\"130.2\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">30</text><text x=\"56\" y=\"84.6\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">40</text><text x=\"56\" y=\"39.0\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">50</text><text x=\"506.0\" y=\"304\" fill=\"#cbd5e1\" font-size=\"15\" text-anchor=\"end\" font-family=\"Segoe UI, Arial\">t in s</text><text x=\"72\" y=\"28.0\" fill=\"#cbd5e1\" font-size=\"15\" font-family=\"Segoe UI, Arial\">v in m/s</text><polygon points=\"64.0,262.0 400.0,116.1 400.0,262.0\" fill=\"#f59e0b\" fill-opacity=\"0.18\"/><polyline points=\"64.0,262.0 484.0,79.6\" fill=\"none\" stroke=\"#f59e0b\" stroke-width=\"3.5\"/><polyline points=\"148.0,225.5 316.0,225.5 316.0,152.6\" fill=\"none\" stroke=\"#f8fafc\" stroke-width=\"2.5\"/><text x=\"232.0\" y=\"245.5\" fill=\"#f8fafc\" font-size=\"16\" font-weight=\"bold\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">Δt = 2 s</text><text x=\"324.0\" y=\"194.0\" fill=\"#f8fafc\" font-size=\"16\" font-weight=\"bold\" font-family=\"Segoe UI, Arial\">Δv = 16 m/s</text><text x=\"341.2\" y=\"239.2\" fill=\"#fbbf24\" font-size=\"16\" font-weight=\"bold\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\">Fläche = Strecke</text></svg><p class=\"caption\">Steigung: a = Δv / Δt = 16 m/s / 2 s = 8 m/s². Die Fläche bis 4 s ist ein Dreieck: x = ½ · 4 s · 32 m/s = 64 m.</p></div>\n\n<h3>Die Fläche ist die Strecke</h3>\n<p>Die Fläche unter der Linie hat die Einheit m/s · s = m. Sie ist die <strong>zurückgelegte Strecke</strong>. Startet der Körper aus der Ruhe, ist die Fläche ein Dreieck:</p>\n<div class=\"formula\">x = ½ · t · v &nbsp;&nbsp;&nbsp; (Grundseite · Höhe : 2)</div>\n<p>Das passt zur Formel x = ½ · a · t², denn v = a · t.</p>\n<div class=\"info-box\"><h4>✏️ So zeichnen Sie eine Bewegung</h4><p>1. Startpunkt markieren (bei v₀ = 0 im Ursprung). 2. Mit v = v₀ + a · t einen zweiten Punkt berechnen, z. B. bei t = 5 s. 3. Beide Punkte mit dem Lineal verbinden.</p></div>\n"
+  }
+};
+
+// =====================================================================
+// Aufgaben für das Modul "Kraft und Beschleunigung" (FOS 12)
+// Hilfsfunktionen aus engine.js. num-Felder: ans in Tausendsteln der Einheit
+// (9,81 -> 9810). tol = erlaubter Spielraum in Tausendsteln.
+// Werte wie im Arbeitsblatt: g = 9,81 m/s², Feder 2 g, Bowlingkugel 5,6 kg,
+// Sportwagen 1200 kg, 0 auf 100 km/h in 5,6 s.
+// =====================================================================
+
+const BASIC = [1, 2, 3, 4];
+const ADVANCED = [5, 6, 7];
+const UNLOCK_TEXT = {
+    5: 'Die Formeln für Ort und Geschwindigkeit. Und: km/h in m/s umrechnen.',
+    6: 'Ein Sportwagen gegen einen frei fallenden Körper: Wer beschleunigt stärker?',
+    7: 'Bewegungen zeichnen und ablesen: Steigung und Fläche im v-t-Diagramm.'
+};
+
+const g0 = 9.81;
+
+// ---------- Zahlen ----------
+const T = x => Math.round(x * 1000);                       // Wert -> Tausendstel
+function de(x, dec) {                                        // 9.811 -> "9,811", 11772 -> "11 772"
+    let s = (dec === undefined) ? String(Number(x.toFixed(6))) : x.toFixed(dec);
+    let [g, k] = s.replace('-', '').split('.');
+    if (g.length > 4) g = g.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return (x < 0 && Number(s) !== 0 ? '−' : '') + g + (k ? ',' + k : '');
+}
+const relTol = (x, p) => Math.max(1, Math.round(Math.abs(T(x)) * p));    // p = 0.01 -> 1 %
+
+// Beim ersten Öffnen kommen die Werte aus dem Arbeitsblatt, danach neue Zahlen
+const _seen = {};
+function erstesMal(key) { if (_seen[key]) return false; _seen[key] = true; return true; }
+
+const RF = ['richtig', 'falsch'];
+function richtigFalsch(all, n, expl) {
+    return function () {
+        const sel = pickN(all, n);
+        if (sel.every(x => x.answer === sel[0].answer)) return richtigFalsch(all, n, expl)();
+        return {
+            type: 'match', q: 'Richtig oder falsch?', options: RF, items: sel,
+            hint: 'Rot markierte Aussagen haben Sie noch falsch eingeschätzt. Lesen Sie den Lerntext dazu noch einmal.',
+            explanation: expl
+        };
+    };
+}
+
+// Rechenweg mit Zeilennummern (für "Fehler finden")
+function calcBox(lines) {
+    return '<div class="calc">' + lines.map((s, k) => '<div><span class="calc-nr">Zeile ' + (k + 1) + '</span>' + s + '</div>').join('') + '</div>';
+}
+function fehlerTask(q, lines, falsch, expl, hint) {
+    return {
+        type: 'mc', svg: calcBox(lines), q,
+        options: lines.map((s, k) => 'Zeile ' + (k + 1)), correct: falsch - 1,
+        hint: hint || 'Prüfen Sie jede Zeile: Stimmt die Formel? Stimmen die Einheiten? Stimmt die Rechnung?',
+        explanation: expl
+    };
+}
+
+// ---------- v-t-Diagramm als SVG ----------
+// lines: [{lab, col, pts: [[t, v], ...], at: Index des beschrifteten Punkts, dots: true}]
+const COL = ['#38bdf8', '#f59e0b', '#4ade80', '#f472b6'];
+function vtSvg(lines, opt) {
+    opt = opt || {};
+    const tmax = opt.tmax || 5, vmax = opt.vmax || 50, vstep = opt.vstep || 10;
+    const x0 = 64, y0 = 262, w = 420, h = 228;
+    const X = t => x0 + t / tmax * w, Y = v => y0 - v / vmax * h;
+    const F = 'font-family="Segoe UI, Arial"';
+    let s = '<svg viewBox="0 0 540 310" role="img" aria-label="v-t-Diagramm: Geschwindigkeit in m/s über der Zeit in s">';
+    for (let v = vstep / 2; v <= vmax; v += vstep / 2)
+        s += '<line x1="' + x0 + '" y1="' + Y(v) + '" x2="' + X(tmax) + '" y2="' + Y(v) + '" stroke="#334155" stroke-width="1"/>';
+    for (let t = 1; t <= tmax; t++)
+        s += '<line x1="' + X(t) + '" y1="' + y0 + '" x2="' + X(t) + '" y2="' + Y(vmax) + '" stroke="#334155" stroke-width="1"/>';
+    s += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + (X(tmax) + 22) + '" y2="' + y0 + '" stroke="#94a3b8" stroke-width="2"/>';
+    s += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + x0 + '" y2="' + (Y(vmax) - 18) + '" stroke="#94a3b8" stroke-width="2"/>';
+    for (let t = 0; t <= tmax; t++)
+        s += '<text x="' + X(t) + '" y="' + (y0 + 22) + '" fill="#cbd5e1" font-size="15" text-anchor="middle" ' + F + '>' + t + '</text>';
+    for (let v = vstep; v <= vmax; v += vstep)
+        s += '<text x="' + (x0 - 8) + '" y="' + (Y(v) + 5) + '" fill="#cbd5e1" font-size="15" text-anchor="end" ' + F + '>' + v + '</text>';
+    s += '<text x="' + (X(tmax) + 22) + '" y="' + (y0 + 42) + '" fill="#cbd5e1" font-size="15" text-anchor="end" ' + F + '>t in s</text>';
+    s += '<text x="' + (x0 + 8) + '" y="' + (Y(vmax) - 6) + '" fill="#cbd5e1" font-size="15" ' + F + '>v in m/s</text>';
+    lines.forEach((L, k) => {
+        const col = L.col || COL[k % COL.length];
+        s += '<polyline points="' + L.pts.map(p => X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1)).join(' ') + '" fill="none" stroke="' + col + '" stroke-width="3.5"/>';
+        if (L.dots) L.pts.forEach(p => {
+            s += '<line x1="' + X(p[0]) + '" y1="' + Y(p[1]).toFixed(1) + '" x2="' + x0 + '" y2="' + Y(p[1]).toFixed(1) + '" stroke="' + col + '" stroke-width="1.5" stroke-dasharray="5 4"/>';
+            s += '<line x1="' + X(p[0]) + '" y1="' + Y(p[1]).toFixed(1) + '" x2="' + X(p[0]) + '" y2="' + y0 + '" stroke="' + col + '" stroke-width="1.5" stroke-dasharray="5 4"/>';
+            s += '<circle cx="' + X(p[0]) + '" cy="' + Y(p[1]).toFixed(1) + '" r="5" fill="' + col + '"/>';
+        });
+        if (L.lab) {
+            const p = L.pts[L.at === undefined ? L.pts.length - 1 : L.at];
+            let lx = X(p[0]) + 10, anchor = 'start';
+            if (lx > 500) { lx = X(p[0]) - 10; anchor = 'end'; }
+            const ly = Math.max(Y(p[1]) - 8, 24);
+            s += '<text x="' + lx + '" y="' + ly.toFixed(1) + '" fill="' + col + '" font-size="19" font-weight="bold" text-anchor="' + anchor + '" ' + F + '>' + L.lab + '</text>';
+        }
+    });
+    return s + '</svg>';
+}
+
+// ---------- Fahrzeuge (0 auf 100 km/h) ----------
+const FAHRZEUGE = [
+    { name: 'Sportwagen', m: 1200, t: 5.6 },
+    { name: 'Elektro-Sportwagen', m: 2100, t: 2.9 },
+    { name: 'Kleinwagen', m: 1050, t: 12.5 },
+    { name: 'Kompakt-SUV', m: 1600, t: 9.2 },
+    { name: 'Motorrad (mit Fahrer)', m: 290, t: 3.4 },
+    { name: 'Lieferwagen', m: 2500, t: 15 }
+];
+const V100 = 100 / 3.6;
+
+// ---------- Leichte und schwere Gegenstände (freier Fall) ----------
+const LEICHT = [
+    { n: 'Feder', g: 2 }, { n: '1-Cent-Münze', g: 2.3 }, { n: 'Blatt Papier', g: 5 }, { n: 'Wattebausch', g: 0.5 }
+];
+const SCHWER = [
+    { n: 'Bowlingkugel', kg: 5.6 }, { n: 'Hantelscheibe', kg: 10 }, { n: 'Wassermelone', kg: 4.2 }, { n: 'Kugelstoßkugel', kg: 7.26 }
+];
+function fallPaar(key) {
+    if (erstesMal(key)) return [LEICHT[0], SCHWER[0]];
+    return [rnd(LEICHT), rnd(SCHWER)];
+}
+
+// =====================================================================
+const TASKS = {
+// ---------------------------------------------------------------- Modul 1
+1: [
+    {
+        type: 'mc', shuffle: true,
+        q: 'Eine Raumsonde fliegt weit weg von allen Planeten und Sternen. Die Triebwerke werden abgeschaltet. Was passiert?',
+        options: ['Die Sonde wird langsamer und bleibt irgendwann stehen.',
+                  'Die Sonde fliegt mit gleicher Geschwindigkeit geradeaus weiter.',
+                  'Die Sonde wird immer schneller.',
+                  'Die Sonde fliegt eine Kurve und kehrt um.'],
+        correct: 1,
+        wrongHints: { 'Die Sonde wird langsamer und bleibt irgendwann stehen.': 'Auf der Erde bremsen Reibung und Luftwiderstand. Im leeren Weltraum gibt es beides nicht.' },
+        hint: 'Denken Sie an das 1. Newtonsche Gesetz: Ohne Kraft ändert sich der Bewegungszustand nicht.',
+        explanation: 'Ohne Kraft bleibt der Bewegungszustand erhalten. Die Sonde fliegt mit <strong>gleicher Geschwindigkeit geradeaus</strong> weiter. Dafür braucht sie keinen Antrieb. Deshalb fliegen Raumsonden jahrzehntelang durch das Sonnensystem.'
+    },
+    function () {
+        const all = [
+            ['Ein Bus bremst plötzlich stark.', 'nach vorn'],
+            ['Ein Zug macht eine Vollbremsung.', 'nach vorn'],
+            ['Ein Fahrrad prallt gegen einen Bordstein.', 'nach vorn'],
+            ['Eine Straßenbahn fährt ruckartig an.', 'nach hinten'],
+            ['Eine Achterbahn wird beim Start stark beschleunigt.', 'nach hinten'],
+            ['Ein Flugzeug beschleunigt auf der Startbahn.', 'nach hinten'],
+            ['Ein Auto fährt schnell in eine Linkskurve.', 'nach rechts'],
+            ['Ein Auto fährt schnell in eine Rechtskurve.', 'nach links']
+        ].map(x => ({ left: x[0], answer: x[1] }));
+        const kurve = rnd(all.filter(x => x.answer === 'nach rechts' || x.answer === 'nach links'));
+        const vorn = rnd(all.filter(x => x.answer === 'nach vorn'));
+        const hinten = rnd(all.filter(x => x.answer === 'nach hinten'));
+        const rest = rnd(all.filter(x => x !== vorn && x !== hinten && x.answer.indexOf('rechts') < 0 && x.answer.indexOf('links') < 0));
+        return {
+            type: 'match', q: 'In welche Richtung kippen die Personen? (vom Fahrzeug aus gesehen)',
+            options: ['nach vorn', 'nach hinten', 'nach rechts', 'nach links'],
+            items: shuffle([kurve, vorn, hinten, rest]),
+            hint: 'Der Körper will seine alte Bewegung beibehalten. Überlegen Sie: Was macht das Fahrzeug, was „will“ der Körper?',
+            explanation: 'Bremsen: Der Körper will weiterfahren → <strong>nach vorn</strong>. Anfahren: Der Körper will stehen bleiben → <strong>nach hinten</strong>. Kurve: Der Körper will geradeaus weiter → zur <strong>Kurvenaußenseite</strong> (Linkskurve: nach rechts).'
+        };
+    },
+    {
+        type: 'mc', shuffle: true, level: 'Begründen',
+        q: 'Ein Bus bremst stark. Die stehenden Fahrgäste kippen nach vorn. Welche Erklärung ist richtig?',
+        options: ['Eine Kraft drückt die Fahrgäste nach vorn.',
+                  'Wegen ihrer Trägheit bewegen sich die Fahrgäste mit der alten Geschwindigkeit weiter. Gebremst wird nur der Bus.',
+                  'Der Fahrtwind schiebt die Fahrgäste nach vorn.',
+                  'Die Fahrgäste werden beim Bremsen schwerer.'],
+        correct: 1,
+        wrongHints: { 'Eine Kraft drückt die Fahrgäste nach vorn.': 'Es gibt keine Kraft nach vorn. Fragen Sie sich: Welcher Körper wird hier gebremst, und welcher nicht?' },
+        hint: 'Trägheit: Jeder Körper behält seine Geschwindigkeit bei, solange keine Kraft wirkt.',
+        explanation: 'Der Bus wird gebremst, die Fahrgäste aber nicht. Wegen ihrer <strong>Trägheit</strong> bewegen sie sich weiter. Erst eine Kraft (Haltestange, Sicherheitsgurt) bremst sie ab. Genau dafür gibt es den Gurt.'
+    },
+    {
+        type: 'mc', shuffle: true, level: 'Begründen',
+        q: 'Ein Auto fährt auf gerader Straße mit konstant 100 km/h. Der Motor treibt die ganze Zeit an. Warum wird das Auto nicht schneller?',
+        options: ['Bei konstanter Geschwindigkeit braucht der Motor keine Kraft.',
+                  'Antriebskraft und Widerstandskräfte (Luft, Reibung) sind gleich groß. Die resultierende Kraft ist null.',
+                  'Die Antriebskraft ist kleiner als die Widerstandskräfte.',
+                  'Das Auto ist zu schwer, um schneller zu werden.'],
+        correct: 1,
+        wrongHints: {
+            'Bei konstanter Geschwindigkeit braucht der Motor keine Kraft.': 'Ohne Motor würden Luftwiderstand und Reibung das Auto abbremsen.',
+            'Die Antriebskraft ist kleiner als die Widerstandskräfte.': 'Dann würde das Auto langsamer werden.'
+        },
+        hint: 'Wenn sich die Geschwindigkeit nicht ändert, ist die Summe aller Kräfte …?',
+        explanation: 'Antriebskraft und Widerstandskräfte heben sich auf: <strong>Kräftegleichgewicht</strong>. Die resultierende Kraft ist null. Nach dem 1. Gesetz bleibt die Geschwindigkeit dann konstant.'
+    },
+    richtigFalsch([
+        { left: 'Ein Körper, der sich gleichförmig geradeaus bewegt, braucht keine resultierende Kraft.', answer: 'richtig' },
+        { left: 'Damit sich ein Körper bewegt, muss immer eine resultierende Kraft auf ihn wirken.', answer: 'falsch' },
+        { left: 'Je größer die Masse, desto träger ist ein Körper.', answer: 'richtig' },
+        { left: 'Fährt ein Auto mit konstantem Tempo durch eine Kurve, ändert sich sein Bewegungszustand.', answer: 'richtig' },
+        { left: 'Zum Bewegungszustand gehören Betrag und Richtung der Geschwindigkeit.', answer: 'richtig' },
+        { left: 'Ein ruhender Körper bleibt nur dann in Ruhe, wenn gar keine Kräfte auf ihn wirken.', answer: 'falsch' },
+        { left: 'Das 1. Newtonsche Gesetz heißt auch Trägheitsgesetz.', answer: 'richtig' }
+    ], 5, 'Nicht die Bewegung braucht eine Kraft, sondern die <strong>Änderung</strong> der Bewegung. Auch eine Richtungsänderung (Kurve) ist eine Änderung. Kräfte, die sich aufheben, ändern nichts.')
+],
+// ---------------------------------------------------------------- Modul 2
+2: [
+    function () {
+        const m1 = rint(70, 100), a1 = rnd([0.8, 1.2, 1.5, 2]);
+        const FkN = rnd([2.4, 3.6, 4.5, 6]), mt = rnd([1.2, 1.5, 1.8]);
+        const F3 = rnd([150, 240, 360, 450]), a3 = rnd([1.5, 2, 2.5, 3]);
+        const a2 = FkN * 1000 / (mt * 1000), m3 = F3 / a3;
+        const fields = shuffle([
+            { label: 'Radfahrer mit Rad: m = ' + m1 + ' kg, a = ' + de(a1) + ' m/s². Gesucht: Kraft F', unit: 'N', ans: T(m1 * a1), tol: 10,
+              errors: [{ v: T(m1 / a1), msg: 'F = m · a: malnehmen, nicht teilen.', tol: relTol(m1 / a1, 0.01) }] },
+            { label: 'Auto: m = ' + de(mt) + ' t, F = ' + de(FkN) + ' kN. Gesucht: Beschleunigung a', unit: 'm/s²', ans: T(a2), tol: 10,
+              errors: [{ v: T(FkN / (mt * 1000)), msg: 'kN in N umrechnen: 1 kN = 1000 N.', tol: 2 },
+                       { v: T(FkN * 1000 / mt), msg: 't in kg umrechnen: 1 t = 1000 kg.', tol: relTol(FkN * 1000 / mt, 0.01) }] },
+            { label: 'Schlitten: F = ' + F3 + ' N, a = ' + de(a3) + ' m/s². Gesucht: Masse m', unit: 'kg', ans: T(m3), tol: 10,
+              errors: [{ v: T(F3 * a3), msg: 'm = F / a: teilen, nicht malnehmen.', tol: relTol(F3 * a3, 0.01) }] }
+        ]);
+        return {
+            type: 'num', q: 'Rechnen mit F = m · a.',
+            note: 'Runden Sie auf zwei Nachkommastellen. Komma oder Punkt ist egal.',
+            fields,
+            hint: 'F = m · a, a = F / m, m = F / a. Rechnen Sie t in kg und kN in N um.',
+            explanation: fields.map(f => f.label.split('. Gesucht')[0] + ' → <strong>' + de(f.ans / 1000, 2) + ' ' + f.unit + '</strong>').join('<br>')
+        };
+    },
+    function () {
+        const sz = [
+            { t: 'Die Kraft F wird verdoppelt.', f: 2, e: [{ v: 0.5, msg: 'Mehr Kraft bedeutet mehr Beschleunigung.' }] },
+            { t: 'Die Kraft F wird verdreifacht.', f: 3, e: [] },
+            { t: 'Die Masse m wird verdoppelt.', f: 0.5, e: [{ v: 2, msg: 'Mehr Masse bedeutet weniger Beschleunigung. a = F / m.' }] },
+            { t: 'Die Masse m wird halbiert.', f: 2, e: [{ v: 0.5, msg: 'Weniger Masse bedeutet mehr Beschleunigung.' }] },
+            { t: 'Die Masse m wird verdreifacht.', f: 1 / 3, e: [{ v: 3, msg: 'Die Masse steht im Nenner: a = F / m.' }] },
+            { t: 'Kraft und Masse werden beide verdoppelt.', f: 1, e: [{ v: 4, msg: 'Die Masse steht im Nenner: 2 : 2 = 1.' }, { v: 2, msg: 'Die doppelte Masse halbiert die Beschleunigung wieder.' }] },
+            { t: 'Die Kraft wird verdoppelt, die Masse vervierfacht.', f: 0.5, e: [{ v: 8, msg: 'Die Masse steht im Nenner: 2 : 4.' }, { v: 2, msg: 'Die Masse steht im Nenner: 2 : 4.' }] }
+        ];
+        let sel;
+        do { sel = pickN(sz, 3); } while (!sel.some(s => s.t.indexOf('Masse') >= 0) || sel.every(s => s.t.indexOf('Masse') >= 0));
+        return {
+            type: 'num', q: 'Wie ändert sich die Beschleunigung a? Geben Sie den Faktor an.',
+            note: 'Beispiel: Wird a halb so groß, tragen Sie 0,5 ein. Wird a doppelt so groß, tragen Sie 2 ein.',
+            fields: sel.map(s => ({ label: s.t, prefix: 'a<sub>neu</sub> =', unit: '· a<sub>alt</sub>', ans: T(s.f), tol: 4, small: true,
+                                    errors: s.e.map(e => ({ v: T(e.v), msg: e.msg, tol: 4 })) })),
+            hint: 'a = F / m. Die Kraft steht im Zähler (proportional). Die Masse steht im Nenner (umgekehrt proportional).',
+            explanation: sel.map(s => s.t + ' → a<sub>neu</sub> = <strong>' + de(Math.round(s.f * 1000) / 1000) + ' · a<sub>alt</sub></strong>').join('<br>')
+        };
+    },
+    {
+        type: 'mc', shuffle: true,
+        q: 'Was bedeutet die Einheit <strong>1 Newton</strong>?',
+        options: ['1 N ist die Kraft, die einen Körper mit 1 kg mit 1 m/s² beschleunigt.',
+                  '1 N ist die Gewichtskraft von 1 kg.',
+                  '1 N ist die Kraft, die einen Körper mit 1 kg auf 1 m/s bringt.',
+                  '1 N ist die Masse von 100 g.'],
+        correct: 0,
+        wrongHints: {
+            '1 N ist die Gewichtskraft von 1 kg.': 'Die Gewichtskraft von 1 kg ist 9,81 N.',
+            '1 N ist die Masse von 100 g.': 'Newton ist die Einheit der Kraft, nicht der Masse.'
+        },
+        hint: 'Setzen Sie in F = m · a für m und a jeweils „1“ mit Einheit ein.',
+        explanation: '1 N = 1 kg · 1 m/s². Eine Kraft von 1 N beschleunigt 1 kg mit <strong>1 m/s²</strong>. Die Geschwindigkeit steigt also pro Sekunde um 1 m/s.'
+    },
+    function () {
+        const mt = rnd([1.6, 1.8, 2.2, 2.4]), a = rnd([1.5, 2, 2.5, 3]);
+        const m = mt * 1000, F = m * a;
+        const art = rnd(['tonne', 'formel', 'rechnung', 'einheit']);
+        const L = ['F = m · a', 'F = ' + de(m) + ' kg · ' + de(a) + ' m/s²', 'F = ' + de(F) + ' kg · m/s²', 'F = ' + de(F) + ' N'];
+        let falsch, expl;
+        if (art === 'tonne') {
+            L[1] = 'F = ' + de(mt) + ' kg · ' + de(a) + ' m/s²'; L[2] = 'F = ' + de(mt * a) + ' kg · m/s²'; L[3] = 'F = ' + de(mt * a) + ' N';
+            falsch = 2; expl = 'In Zeile 2 wurde die Masse nicht umgerechnet: ' + de(mt) + ' t = ' + de(m) + ' kg.';
+        } else if (art === 'formel') {
+            L[0] = 'F = m / a'; L[1] = 'F = ' + de(m) + ' kg / ' + de(a) + ' m/s²'; L[2] = 'F = ' + de(Math.round(m / a * 100) / 100) + ' kg · s²/m'; L[3] = 'F = ' + de(Math.round(m / a * 100) / 100) + ' N';
+            falsch = 1; expl = 'Schon in Zeile 1 ist die Formel falsch: F = m <strong>·</strong> a.';
+        } else if (art === 'rechnung') {
+            L[2] = 'F = ' + de(F * 10) + ' kg · m/s²'; L[3] = 'F = ' + de(F * 10) + ' N';
+            falsch = 3; expl = 'In Zeile 3 ist die Rechnung falsch: ' + de(m) + ' · ' + de(a) + ' = ' + de(F) + '.';
+        } else {
+            L[3] = 'F = ' + de(F) + ' kg';
+            falsch = 4; expl = 'In Zeile 4 ist die Einheit falsch. kg · m/s² ist <strong>N</strong>, nicht kg.';
+        }
+        return fehlerTask('Fehler finden: Ein Transporter (m = ' + de(mt) + ' t) soll mit a = ' + de(a) + ' m/s² beschleunigen. Ein Mitschüler berechnet die nötige Kraft. In welcher Zeile steht der <strong>erste</strong> Fehler?',
+            L, falsch, expl + ' Richtig ist F = <strong>' + de(F) + ' N</strong>.');
+    },
+    function () {
+        const ml = rnd([1800, 2000, 2200]), al = rnd([2, 2.5, 3]), zu = rnd([800, 1000, 1200, 1500]);
+        const mb = ml + zu, F = ml * al, ab = F / mb;
+        return {
+            type: 'num', level: 'Knobelaufgabe',
+            q: 'Ein leerer Transporter (' + de(ml) + ' kg) beschleunigt mit a = ' + de(al) + ' m/s². Dann wird er mit ' + de(zu) + ' kg beladen. Die Antriebskraft bleibt gleich. Wie stark beschleunigt er jetzt?',
+            note: 'Widerstandskräfte bleiben unberücksichtigt. Runden Sie a auf zwei Nachkommastellen.',
+            fields: [
+                { label: 'Antriebskraft F', unit: 'N', ans: T(F), tol: 10 },
+                { label: 'Gesamtmasse beladen', unit: 'kg', ans: T(mb), errors: [{ v: T(zu), msg: 'Der Transporter fährt mit: Leermasse + Ladung.' }] },
+                { label: 'Beschleunigung beladen', unit: 'm/s²', ans: T(ab), tol: 10,
+                  errors: [{ v: T(al * mb / ml), msg: 'Mehr Masse bedeutet weniger Beschleunigung.', tol: 10 }, { v: T(F / zu), msg: 'Teilen Sie durch die Gesamtmasse, nicht nur durch die Ladung.', tol: 10 }] }
+            ],
+            hint: 'Erst F = m<sub>leer</sub> · a<sub>leer</sub>. Dann a<sub>beladen</sub> = F / m<sub>gesamt</sub>.',
+            explanation: 'F = ' + de(ml) + ' kg · ' + de(al) + ' m/s² = <strong>' + de(F) + ' N</strong>. m = ' + de(ml) + ' kg + ' + de(zu) + ' kg = <strong>' + de(mb) + ' kg</strong>. a = ' + de(F) + ' N / ' + de(mb) + ' kg ≈ <strong>' + de(ab, 2) + ' m/s²</strong>.'
+        };
+    }
+],
+// ---------------------------------------------------------------- Modul 3
+3: [
+    function () {
+        const all = [
+            ['Ihre Hand drückt gegen eine Wand.', 'Die Wand drückt gegen Ihre Hand.'],
+            ['Die Erde zieht einen Apfel an.', 'Der Apfel zieht die Erde an.'],
+            ['Eine Rakete stößt Gas nach hinten aus.', 'Das Gas drückt die Rakete nach vorn.'],
+            ['Ein Schwimmer drückt das Wasser nach hinten.', 'Das Wasser drückt den Schwimmer nach vorn.'],
+            ['Ihr Fuß drückt beim Gehen den Boden nach hinten.', 'Der Boden drückt Ihren Fuß nach vorn.'],
+            ['Ein Hammer schlägt auf einen Nagel.', 'Der Nagel drückt gegen den Hammer.'],
+            ['Ein Auto zieht einen Anhänger nach vorn.', 'Der Anhänger zieht das Auto nach hinten.']
+        ].map(x => ({ left: x[0], answer: x[1] }));
+        const sel = pickN(all, 4);
+        return {
+            type: 'match', q: 'Kraft und Gegenkraft: Welche Gegenkraft gehört zu welcher Kraft?',
+            options: shuffle(sel.map(x => x.answer).concat(['Die Gewichtskraft zieht nach unten.'])),
+            items: sel,
+            hint: 'Die Gegenkraft wirkt auf den <strong>anderen</strong> Körper und zeigt in die <strong>entgegengesetzte</strong> Richtung.',
+            explanation: 'Kraft: A wirkt auf B. Gegenkraft: B wirkt auf A, gleich groß, entgegengesetzt. Eine Antwort blieb übrig: Die Gewichtskraft ist keine Gegenkraft zu diesen Kräften.'
+        };
+    },
+    {
+        type: 'mc', shuffle: true,
+        q: 'Ein Pkw prallt frontal auf einen viel schwereren Lkw. Welche Aussage stimmt?',
+        options: ['Der Pkw erfährt die größere Kraft, weil er leichter ist.',
+                  'Der Lkw erfährt die größere Kraft, weil er schwerer ist.',
+                  'Beide erfahren gleich große Kräfte. Der Pkw wird aber viel stärker abgebremst.',
+                  'Beide erfahren gleich große Kräfte und werden gleich stark abgebremst.'],
+        correct: 2,
+        wrongHints: { 'Beide erfahren gleich große Kräfte und werden gleich stark abgebremst.': 'Gleiche Kraft, aber verschiedene Massen. Was sagt a = F / m?' },
+        hint: 'Kraft: 3. Gesetz. Beschleunigung: 2. Gesetz (a = F / m).',
+        explanation: 'Nach dem 3. Gesetz sind die Kräfte <strong>gleich groß</strong>. Nach dem 2. Gesetz ist a = F / m. Der Pkw hat die kleinere Masse. Er wird deshalb <strong>viel stärker</strong> abgebremst. Darum sind die Insassen im Pkw stärker gefährdet.'
+    },
+    function () {
+        const FkN = rnd([18, 24, 30, 36]), mp = rnd([1000, 1200, 1500]), ml = rnd([7500, 12000, 15000]);
+        const F = FkN * 1000;
+        return {
+            type: 'num',
+            q: 'Ein Pkw (' + de(mp) + ' kg) und ein Lkw (' + de(ml) + ' kg) stoßen zusammen. Der Lkw drückt mit <strong>' + FkN + ' kN</strong> auf den Pkw.',
+            note: 'Runden Sie auf zwei Nachkommastellen.',
+            fields: [
+                { label: 'Kraft, mit der der Pkw auf den Lkw drückt', unit: 'kN', ans: T(FkN),
+                  errors: [{ v: T(FkN * mp / ml), msg: 'Kraft und Gegenkraft sind immer gleich groß, egal wie schwer die Körper sind.', tol: 50 }] },
+                { label: 'Beschleunigung (Abbremsung) des Pkw', unit: 'm/s²', ans: T(F / mp), tol: 10,
+                  errors: [{ v: T(FkN / mp), msg: 'kN in N umrechnen: 1 kN = 1000 N.', tol: 2 }] },
+                { label: 'Beschleunigung (Abbremsung) des Lkw', unit: 'm/s²', ans: T(F / ml), tol: 10,
+                  errors: [{ v: T(F / mp), msg: 'Der Lkw hat eine andere Masse.', tol: 10 }] }
+            ],
+            hint: 'Kraft und Gegenkraft sind gleich groß. Dann jeweils a = F / m.',
+            explanation: 'Beide Kräfte sind <strong>' + FkN + ' kN</strong>. Pkw: a = ' + de(F) + ' N / ' + de(mp) + ' kg = <strong>' + de(F / mp, 2) + ' m/s²</strong>. Lkw: a = ' + de(F) + ' N / ' + de(ml) + ' kg = <strong>' + de(F / ml, 2) + ' m/s²</strong>. Gleiche Kraft, aber der Pkw wird ' + de(ml / mp, 1) + '-mal so stark abgebremst.'
+        };
+    },
+    {
+        type: 'mc', shuffle: true, level: 'Begründen',
+        q: 'Ein Buch liegt ruhig auf dem Tisch. Die Gewichtskraft zieht es nach unten. Der Tisch drückt es mit gleich großer Kraft nach oben. Sind das Kraft und Gegenkraft im Sinne des 3. Newtonschen Gesetzes?',
+        options: ['Ja, denn die beiden Kräfte sind gleich groß und entgegengesetzt.',
+                  'Nein. Beide Kräfte wirken auf das Buch. Sie bilden ein Kräftegleichgewicht.',
+                  'Nein, denn die Kraft des Tisches ist größer als die Gewichtskraft.',
+                  'Ja, denn das Buch bleibt in Ruhe.'],
+        correct: 1,
+        wrongHints: {
+            'Ja, denn die beiden Kräfte sind gleich groß und entgegengesetzt.': 'Gleich groß und entgegengesetzt reicht nicht. Auf welchen Körper wirken die beiden Kräfte?',
+            'Ja, denn das Buch bleibt in Ruhe.': 'Dass das Buch in Ruhe bleibt, zeigt ein Kräftegleichgewicht. Kraft und Gegenkraft wirken aber auf zwei verschiedene Körper.'
+        },
+        hint: 'Kraft und Gegenkraft wirken immer auf <strong>zwei verschiedene</strong> Körper.',
+        explanation: 'Beide Kräfte greifen am <strong>Buch</strong> an. Das ist ein <strong>Kräftegleichgewicht</strong> (1. Gesetz). Die Gegenkraft zur Gewichtskraft ist die Kraft, mit der das Buch die <strong>Erde</strong> anzieht. Die Gegenkraft zur Tischkraft ist die Kraft, mit der das Buch auf den <strong>Tisch</strong> drückt.'
+    },
+    richtigFalsch([
+        { left: 'Kraft und Gegenkraft sind immer gleich groß.', answer: 'richtig' },
+        { left: 'Kraft und Gegenkraft wirken auf denselben Körper.', answer: 'falsch' },
+        { left: 'Kraft und Gegenkraft heben sich gegenseitig auf.', answer: 'falsch' },
+        { left: 'Bei einem Zusammenstoß erfährt das leichtere Fahrzeug die größere Kraft.', answer: 'falsch' },
+        { left: 'Kraft und Gegenkraft zeigen in entgegengesetzte Richtungen.', answer: 'richtig' },
+        { left: 'Eine Rakete funktioniert auch im luftleeren Weltraum.', answer: 'richtig' },
+        { left: 'Wenn Sie auf einer Waage stehen, drückt die Waage mit gleich großer Kraft auf Sie zurück.', answer: 'richtig' }
+    ], 5, 'Kraft und Gegenkraft: gleich groß, entgegengesetzt, auf <strong>verschiedene</strong> Körper. Deshalb heben sie sich nicht auf. Eine Rakete stößt sich am eigenen Gas ab, dafür braucht sie keine Luft.')
+],
+// ---------------------------------------------------------------- Modul 4
+4: [
+    function () {
+        const [l, s] = fallPaar('fg');
+        const Fl = l.g / 1000 * g0, Fs = s.kg * g0;
+        return {
+            type: 'num',
+            q: 'Berechnen Sie die Gewichtskraft einer <strong>' + l.n + '</strong> (m = ' + de(l.g) + ' g) und einer <strong>' + s.n + '</strong> (m = ' + de(s.kg) + ' kg).',
+            note: 'g = 9,81 m/s². Runden Sie die kleine Kraft auf drei, die große auf zwei Nachkommastellen.',
+            fields: [
+                { label: 'Gewichtskraft ' + l.n, unit: 'N', ans: T(Fl), tol: 1,
+                  errors: [{ v: T(l.g * g0), msg: 'Rechnen Sie zuerst g in kg um: 1 g = 0,001 kg.', tol: relTol(l.g * g0, 0.01) }] },
+                { label: 'Gewichtskraft ' + s.n, unit: 'N', ans: T(Fs), tol: 60,
+                  errors: [{ v: T(s.kg), msg: 'Gesucht ist die Kraft in N: F<sub>G</sub> = m · g.', tol: 0 }] }
+            ],
+            hint: 'F<sub>G</sub> = m · g. Die Masse muss in kg eingesetzt werden.',
+            explanation: l.n + ': F<sub>G</sub> = ' + de(l.g / 1000) + ' kg · 9,81 m/s² ≈ <strong>' + de(Fl, 3) + ' N</strong>.<br>' +
+                         s.n + ': F<sub>G</sub> = ' + de(s.kg) + ' kg · 9,81 m/s² ≈ <strong>' + de(Fs, 2) + ' N</strong>.<br>' +
+                         'Die ' + s.n + ' wird ' + de(Math.round(s.kg * 1000 / l.g)) + '-mal so stark angezogen.'
+        };
+    },
+    function () {
+        const [l, s] = fallPaar('a');
+        const Fl = l.g / 1000 * g0, Fs = s.kg * g0;
+        return {
+            type: 'num',
+            q: 'Berechnen Sie mithilfe der Gewichtskraft die Beschleunigung a beim freien Fall.<br><span style="color:#cbd5e1">' +
+               l.n + ': m = ' + de(l.g) + ' g, F<sub>G</sub> = ' + de(Fl, 5) + ' N &nbsp;·&nbsp; ' + s.n + ': m = ' + de(s.kg) + ' kg, F<sub>G</sub> = ' + de(Fs, 3) + ' N</span>',
+            note: 'Im freien Fall wirkt nur die Gewichtskraft. Stellen Sie F = m · a nach a um. Zwei Nachkommastellen.',
+            fields: [
+                { label: 'Beschleunigung ' + l.n, unit: 'm/s²', ans: T(g0), tol: 20,
+                  errors: [{ v: T(Fl / l.g), msg: 'Die Masse muss in kg eingesetzt werden: ' + de(l.g) + ' g = ' + de(l.g / 1000) + ' kg.', tol: 1 }] },
+                { label: 'Beschleunigung ' + s.n, unit: 'm/s²', ans: T(g0), tol: 20,
+                  errors: [{ v: T(Fs * s.kg), msg: 'a = F / m: teilen, nicht malnehmen.', tol: relTol(Fs * s.kg, 0.01) }] }
+            ],
+            hint: 'a = F<sub>G</sub> / m. Masse in kg!',
+            explanation: l.n + ': a = ' + de(Fl, 5) + ' N / ' + de(l.g / 1000) + ' kg = <strong>9,81 m/s²</strong>.<br>' +
+                         s.n + ': a = ' + de(Fs, 3) + ' N / ' + de(s.kg) + ' kg = <strong>9,81 m/s²</strong>.<br>Beide haben dieselbe Fallbeschleunigung g.'
+        };
+    },
+    {
+        type: 'mc', shuffle: true, level: 'Begründen',
+        q: 'Wieso fällt eine Feder im Vakuum genauso schnell wie eine Bowlingkugel?',
+        options: ['Im Vakuum gibt es keine Gravitation. Deshalb schweben beide gleich langsam.',
+                  'Die Bowlingkugel wird stärker angezogen. Sie ist aber auch träger. Kraft und Masse wachsen im gleichen Verhältnis, deshalb ist a = F<sub>G</sub> / m für beide gleich.',
+                  'Im Vakuum haben beide die gleiche Gewichtskraft.',
+                  'Die Feder ist leichter und wird deshalb im Vakuum stärker beschleunigt.'],
+        correct: 1,
+        wrongHints: {
+            'Im Vakuum haben beide die gleiche Gewichtskraft.': 'Die Gewichtskraft hängt von der Masse ab, nicht von der Luft. Sie haben es selbst berechnet.',
+            'Im Vakuum gibt es keine Gravitation. Deshalb schweben beide gleich langsam.': 'Gravitation braucht keine Luft. In einer Vakuumröhre fallen beide nach unten.'
+        },
+        hint: 'Vergleichen Sie: Wie viel mal größer ist die Gewichtskraft der Kugel? Wie viel mal größer ist ihre Masse?',
+        explanation: 'Die Kugel hat 2800-mal so viel Masse. Ihre Gewichtskraft ist auch 2800-mal so groß. Für beide gilt: a = F<sub>G</sub> / m = m · g / m = <strong>g</strong>. Die Masse kürzt sich heraus. Ohne Luftwiderstand fallen deshalb alle Körper gleich schnell.'
+    },
+    {
+        type: 'order', q: 'Bringen Sie die Begründung in die richtige Reihenfolge.',
+        steps: ['Die Bowlingkugel hat 2800-mal so viel Masse wie die Feder.',
+                'Deshalb ist auch ihre Gewichtskraft 2800-mal so groß.',
+                'Wegen der großen Masse ist sie aber auch 2800-mal so träge.',
+                'Mit a = F<sub>G</sub> / m ergibt sich für beide a = 9,81 m/s².',
+                'Ohne Luftwiderstand (im Vakuum) fallen beide deshalb gleich schnell.'],
+        hint: 'Starten Sie bei der Masse. Dann Gewichtskraft, dann Trägheit, dann die Rechnung. Die Folgerung steht am Ende.',
+        explanation: 'Masse → Gewichtskraft → Trägheit → a = F<sub>G</sub> / m = g → gleiche Fallbewegung im Vakuum.'
+    },
+    richtigFalsch([
+        { left: 'Im Vakuum fallen eine Feder und eine Bowlingkugel gleich schnell.', answer: 'richtig' },
+        { left: 'In der Luft fällt die Feder langsamer, weil der Luftwiderstand sie stark bremst.', answer: 'richtig' },
+        { left: 'Die Bowlingkugel hat eine größere Gewichtskraft als die Feder.', answer: 'richtig' },
+        { left: 'Weil die Bowlingkugel schwerer ist, hat sie im Vakuum eine größere Fallbeschleunigung.', answer: 'falsch' },
+        { left: 'g = 9,81 m/s² bedeutet: Die Fallgeschwindigkeit steigt pro Sekunde um 9,81 m/s.', answer: 'richtig' },
+        { left: 'Die Fallbeschleunigung hängt von der Masse des Körpers ab.', answer: 'falsch' },
+        { left: 'Im freien Fall wirkt nur die Gewichtskraft.', answer: 'richtig' },
+        { left: 'Auf dem Mond fallen Hammer und Feder gleich schnell, weil es dort keine Luft gibt.', answer: 'richtig' }
+    ], 5, 'Größere Masse heißt: größere Gewichtskraft, aber auch größere Trägheit. Die Fallbeschleunigung ist deshalb für alle Körper gleich: g = 9,81 m/s². Nur der Luftwiderstand macht in der Luft einen Unterschied.')
+],
+// ---------------------------------------------------------------- Modul 5
+5: [
+    function () {
+        const kmh = pickN([18, 36, 50, 72, 90, 108, 130], 2), ms = rnd([5, 10, 15, 20, 25, 35]);
+        return {
+            type: 'num', q: 'Rechnen Sie die Geschwindigkeiten um.',
+            note: 'Runden Sie auf zwei Nachkommastellen.',
+            fields: kmh.map(v => ({ label: de(v) + ' km/h =', unit: 'm/s', ans: T(v / 3.6), tol: 10,
+                                    errors: [{ v: T(v * 3.6), msg: 'Von km/h nach m/s wird <strong>geteilt</strong>: durch 3,6.', tol: relTol(v * 3.6, 0.01) }] }))
+                .concat([{ label: de(ms) + ' m/s =', unit: 'km/h', ans: T(ms * 3.6), tol: 10,
+                           errors: [{ v: T(ms / 3.6), msg: 'Von m/s nach km/h wird <strong>multipliziert</strong>: mal 3,6.', tol: 10 }] }]),
+            hint: 'km/h → m/s: durch 3,6. m/s → km/h: mal 3,6. Kontrolle: Die Zahl in m/s ist immer kleiner.',
+            explanation: kmh.map(v => de(v) + ' km/h : 3,6 = <strong>' + de(v / 3.6, 2) + ' m/s</strong>').join('<br>') + '<br>' + de(ms) + ' m/s · 3,6 = <strong>' + de(ms * 3.6, 1) + ' km/h</strong>'
+        };
+    },
+    {
+        type: 'match', q: 'Welche Formel ist welches Gesetz?',
+        options: ['Zeit-Ort-Gesetz', 'Zeit-Geschwindigkeit-Gesetz', 'Definition der Beschleunigung', '2. Newtonsches Gesetz', 'gleichförmige Bewegung'],
+        items: [
+            { left: 'x(t) = v₀ · t + ½ · a · t²', answer: 'Zeit-Ort-Gesetz' },
+            { left: 'v(t) = v₀ + a · t', answer: 'Zeit-Geschwindigkeit-Gesetz' },
+            { left: 'a = Δv / Δt', answer: 'Definition der Beschleunigung' },
+            { left: 'F = m · a', answer: '2. Newtonsches Gesetz' },
+            { left: 'x = v · t (a = 0)', answer: 'gleichförmige Bewegung' }
+        ],
+        hint: 'Schauen Sie, was links vom Gleichheitszeichen steht: ein Ort x, eine Geschwindigkeit v, eine Beschleunigung a oder eine Kraft F?',
+        explanation: 'x(t): Zeit-Ort-Gesetz. v(t): Zeit-Geschwindigkeit-Gesetz. a = Δv / Δt: Definition der Beschleunigung. F = m · a: 2. Newtonsches Gesetz. x = v · t gilt nur ohne Beschleunigung.'
+    },
+    function () {
+        const z = rnd([
+            { t: 'Ein Zug', er: 'Er', v0: 36, a: 0.5, s: [20, 30, 40] },
+            { t: 'Ein Radfahrer', er: 'Er', v0: 18, a: 0.8, s: [4, 5, 6] },
+            { t: 'Ein Auto', er: 'Es', v0: 54, a: 1.5, s: [4, 6, 8] },
+            { t: 'Ein Motorrad', er: 'Es', v0: 36, a: 3, s: [3, 4, 5] },
+            { t: 'Ein Auto', er: 'Es', v0: 72, a: 2, s: [3, 4, 5] }
+        ]);
+        const t = rnd(z.s), v0 = z.v0 / 3.6, v = v0 + z.a * t, x = v0 * t + 0.5 * z.a * t * t;
+        return {
+            type: 'num',
+            q: z.t + ' fährt mit v₀ = ' + z.v0 + ' km/h. ' + z.er + ' beschleunigt gleichmäßig mit a = ' + de(z.a) + ' m/s² für t = ' + t + ' s. Wie schnell ist ' + z.er.toLowerCase() + ' danach? Welche Strecke legt ' + z.er.toLowerCase() + ' dabei zurück?',
+            note: 'Rechnen Sie zuerst v₀ in m/s um. Zwei Nachkommastellen.',
+            fields: [
+                { label: 'v₀', unit: 'm/s', ans: T(v0), tol: 10 },
+                { label: 'v(t) = v₀ + a · t', unit: 'm/s', ans: T(v), tol: 20,
+                  errors: [{ v: T(z.v0 + z.a * t), msg: 'v₀ muss in m/s eingesetzt werden.', tol: 20 }, { v: T(z.a * t), msg: 'Vergessen Sie v₀ nicht.', tol: 20 }] },
+                { label: 'x(t) = v₀ · t + ½ · a · t²', unit: 'm', ans: T(x), tol: Math.max(50, relTol(x, 0.005)),
+                  errors: [{ v: T(v0 * t + z.a * t * t), msg: 'Haben Sie das ½ vergessen?', tol: relTol(v0 * t + z.a * t * t, 0.005) },
+                           { v: T(z.v0 * t + 0.5 * z.a * t * t), msg: 'v₀ muss in m/s eingesetzt werden.', tol: relTol(z.v0 * t + 0.5 * z.a * t * t, 0.005) },
+                           { v: T(0.5 * z.a * t * t), msg: 'Der Teil v₀ · t fehlt.', tol: relTol(0.5 * z.a * t * t, 0.005) },
+                           { v: T(v0 * t + 0.5 * z.a * t), msg: 'Die Zeit steht bei ½ · a · t² im Quadrat.', tol: relTol(v0 * t + 0.5 * z.a * t, 0.005) }] }
+            ],
+            hint: 'v₀ = ' + z.v0 + ' km/h : 3,6. Dann die beiden Formeln aus dem Kasten. Achten Sie auf ½ und t².',
+            explanation: 'v₀ = ' + z.v0 + ' km/h : 3,6 ≈ <strong>' + de(v0, 2) + ' m/s</strong>.<br>v = ' + de(v0, 2) + ' m/s + ' + de(z.a) + ' m/s² · ' + t + ' s ≈ <strong>' + de(v, 2) + ' m/s</strong> (≈ ' + de(v * 3.6, 0) + ' km/h).<br>' +
+                         'x = ' + de(v0, 2) + ' m/s · ' + t + ' s + ½ · ' + de(z.a) + ' m/s² · (' + t + ' s)² ≈ <strong>' + de(x, 2) + ' m</strong>.'
+        };
+    },
+    function () {
+        const z = rnd([
+            { t: 'Ein E-Scooter fährt an: von 0 auf 20 km/h in 4 s.', v1: 0, v2: 20 / 3.6, dt: 4, kmh: true },
+            { t: 'Ein Zug fährt an: von 0 auf 72 km/h in 40 s.', v1: 0, v2: 20, dt: 40, kmh: true },
+            { t: 'Eine Sprinterin startet: von 0 auf 9 m/s in 2,5 s.', v1: 0, v2: 9, dt: 2.5, kmh: false },
+            { t: 'Ein Auto bremst: von 50 km/h auf 0 in 2,5 s.', v1: 50 / 3.6, v2: 0, dt: 2.5, kmh: true },
+            { t: 'Ein Bus bremst: von 54 km/h auf 18 km/h in 4 s.', v1: 15, v2: 5, dt: 4, kmh: true }
+        ]);
+        const dv = z.v2 - z.v1, a = dv / z.dt;
+        return {
+            type: 'num', q: z.t + ' Berechnen Sie Δv und die Beschleunigung a.',
+            note: 'Δv = v<sub>Ende</sub> − v<sub>Anfang</sub>, in m/s. Beim Bremsen ist Δv negativ, also auch a. Zwei Nachkommastellen.',
+            fields: [
+                { label: 'Δv', unit: 'm/s', ans: T(dv), tol: 10,
+                  errors: [{ v: T(dv * 3.6), msg: 'Rechnen Sie in m/s um: durch 3,6.', tol: 10 }, { v: T(-dv), msg: 'Ende minus Anfang. Achten Sie auf das Vorzeichen.', tol: 10 }] },
+                { label: 'a = Δv / Δt', unit: 'm/s²', ans: T(a), tol: 10,
+                  errors: [{ v: T(dv * 3.6 / z.dt), msg: 'Die Geschwindigkeit muss in m/s eingesetzt werden.', tol: 10 }, { v: T(-a), msg: 'Achten Sie auf das Vorzeichen.', tol: 10 }] }
+            ],
+            hint: 'Erst in m/s umrechnen. Dann Δv = Ende − Anfang. Dann durch die Zeit teilen.',
+            explanation: 'Δv = ' + de(z.v2, 2) + ' m/s − ' + de(z.v1, 2) + ' m/s = <strong>' + de(dv, 2) + ' m/s</strong>. a = ' + de(dv, 2) + ' m/s / ' + de(z.dt) + ' s ≈ <strong>' + de(a, 2) + ' m/s²</strong>.' +
+                         (a < 0 ? ' Das Minus zeigt: Der Körper wird langsamer.' : '')
+        };
+    },
+    function () {
+        const a = rnd([0.4, 0.5, 0.6, 0.8]), t = rnd([10, 20, 30]);
+        const x = 0.5 * a * t * t;
+        const art = rnd(['formel', 'quadrat', 'halb', 'einheit']);
+        const L = ['x = ½ · a · t²', 'x = 0,5 · ' + de(a) + ' m/s² · (' + t + ' s)²', 'x = ' + de(0.5 * a) + ' m/s² · ' + de(t * t) + ' s²', 'x = ' + de(x) + ' m'];
+        let falsch, expl;
+        if (art === 'formel') {
+            L[0] = 'x = ½ · a · t'; L[1] = 'x = 0,5 · ' + de(a) + ' m/s² · ' + t + ' s'; L[2] = 'x = ' + de(0.5 * a) + ' m/s² · ' + t + ' s'; L[3] = 'x = ' + de(0.5 * a * t) + ' m';
+            falsch = 1; expl = 'Schon in Zeile 1 fehlt das Quadrat: x = ½ · a · t<strong>²</strong>.';
+        } else if (art === 'quadrat') {
+            L[2] = 'x = ' + de(0.5 * a) + ' m/s² · ' + de(2 * t) + ' s²'; L[3] = 'x = ' + de(a * t) + ' m';
+            falsch = 3; expl = 'In Zeile 3 wurde (' + t + ' s)² falsch gerechnet: ' + t + ' · ' + t + ' = ' + de(t * t) + ', nicht ' + (2 * t) + '.';
+        } else if (art === 'halb') {
+            L[2] = 'x = ' + de(a) + ' m/s² · ' + de(t * t) + ' s²'; L[3] = 'x = ' + de(a * t * t) + ' m';
+            falsch = 3; expl = 'In Zeile 3 ist das ½ verschwunden. 0,5 · ' + de(a) + ' = ' + de(0.5 * a) + '.';
+        } else {
+            L[3] = 'x = ' + de(x) + ' m/s';
+            falsch = 4; expl = 'In Zeile 4 ist die Einheit falsch: m/s² · s² = <strong>m</strong>.';
+        }
+        return fehlerTask('Fehler finden: Ein Zug fährt aus dem Stand an (v₀ = 0). a = ' + de(a) + ' m/s². Welche Strecke legt er in ' + t + ' s zurück? In welcher Zeile steht der <strong>erste</strong> Fehler?',
+            L, falsch, expl + ' Richtig: x = <strong>' + de(x) + ' m</strong>.');
+    }
+],
+// ---------------------------------------------------------------- Modul 6
+6: [
+    function () {
+        const f = erstesMal('auto') ? FAHRZEUGE[0] : rnd(FAHRZEUGE);
+        const a = V100 / f.t;
+        return {
+            type: 'num',
+            q: 'Ein <strong>' + f.name + '</strong> (m = ' + de(f.m) + ' kg) beschleunigt in <strong>' + de(f.t) + ' s</strong> von 0 auf 100 km/h. Vergleichen Sie seine Beschleunigung a<sub>S</sub> mit der eines frei fallenden Körpers.',
+            note: 'g = 9,81 m/s². Zwei Nachkommastellen.',
+            fields: [
+                { label: 'Endgeschwindigkeit', unit: 'm/s', ans: T(V100), tol: 10, errors: [{ v: T(100), msg: 'Rechnen Sie km/h in m/s um: durch 3,6.', tol: 0 }] },
+                { label: 'Beschleunigung a<sub>S</sub>', unit: 'm/s²', ans: T(a), tol: 20,
+                  errors: [{ v: T(100 / f.t), msg: 'Sie haben mit km/h gerechnet. Erst in m/s umrechnen!', tol: 20 }, { v: T(f.t / V100), msg: 'a = Δv / Δt: Geschwindigkeit durch Zeit.', tol: 5 }] },
+                { label: 'a<sub>S</sub> / g (a<sub>S</sub> ist das …-fache von g)', unit: '', ans: T(a / g0), tol: 10,
+                  errors: [{ v: T(g0 / a), msg: 'Umgekehrt: a<sub>S</sub> geteilt durch g.', tol: 10 }] }
+            ],
+            hint: 'v = 100 km/h : 3,6. Dann a = Δv / Δt. Dann a<sub>S</sub> durch 9,81 teilen.',
+            explanation: 'v = 100 km/h : 3,6 ≈ <strong>27,78 m/s</strong>. a<sub>S</sub> = 27,78 m/s / ' + de(f.t) + ' s ≈ <strong>' + de(a, 2) + ' m/s²</strong>. ' +
+                         'a<sub>S</sub> / g = ' + de(a, 2) + ' / 9,81 ≈ <strong>' + de(a / g0, 2) + '</strong>. ' +
+                         (a / g0 > 0.95 && a / g0 < 1.05 ? 'Der ' + f.name + ' beschleunigt fast so stark wie ein fallender Körper!' :
+                          a / g0 < 1 ? 'Der fallende Körper beschleunigt etwa ' + de(g0 / a, 1) + '-mal so stark.' : 'Der ' + f.name + ' beschleunigt stärker als ein fallender Körper!')
+        };
+    },
+    function () {
+        const f = erstesMal('strecke') ? FAHRZEUGE[0] : rnd(FAHRZEUGE);
+        const a = V100 / f.t, xs = 0.5 * a * f.t * f.t, xk = 0.5 * g0 * f.t * f.t;
+        return {
+            type: 'num',
+            q: 'Der <strong>' + f.name + '</strong> braucht ' + de(f.t) + ' s von 0 auf 100 km/h (a<sub>S</sub> ≈ ' + de(a, 2) + ' m/s²). Berechnen Sie die Strecken x<sub>S</sub> und x<sub>K</sub>, die das Fahrzeug und ein frei fallender Körper in dieser Zeit zurücklegen.',
+            note: 'Beide starten aus der Ruhe (v₀ = 0). g = 9,81 m/s². Eine Nachkommastelle.',
+            fields: [
+                { label: 'x<sub>S</sub> (Fahrzeug)', unit: 'm', ans: T(xs), tol: relTol(xs, 0.01),
+                  errors: [{ v: T(2 * xs), msg: 'Haben Sie das ½ vergessen?', tol: relTol(2 * xs, 0.01) }, { v: T(0.5 * a * f.t), msg: 'Die Zeit steht im Quadrat.', tol: relTol(0.5 * a * f.t, 0.01) }] },
+                { label: 'x<sub>K</sub> (freier Fall)', unit: 'm', ans: T(xk), tol: relTol(xk, 0.01),
+                  errors: [{ v: T(2 * xk), msg: 'Haben Sie das ½ vergessen?', tol: relTol(2 * xk, 0.01) }, { v: T(0.5 * g0 * f.t), msg: 'Die Zeit steht im Quadrat.', tol: relTol(0.5 * g0 * f.t, 0.01) }] }
+            ],
+            hint: 'x = ½ · a · t². Für den freien Fall ist a = g.',
+            explanation: 'x<sub>S</sub> = ½ · ' + de(a, 2) + ' m/s² · (' + de(f.t) + ' s)² ≈ <strong>' + de(xs, 1) + ' m</strong>.<br>' +
+                         'x<sub>K</sub> = ½ · 9,81 m/s² · (' + de(f.t) + ' s)² ≈ <strong>' + de(xk, 1) + ' m</strong>.<br>' +
+                         'Kontrolle: x<sub>K</sub> / x<sub>S</sub> = g / a<sub>S</sub> ≈ ' + de(g0 / a, 2) + '.'
+        };
+    },
+    function () {
+        const f = erstesMal('kraft') ? FAHRZEUGE[0] : rnd(FAHRZEUGE);
+        const a = V100 / f.t, F = f.m * a, tk = V100 / g0;
+        return {
+            type: 'num',
+            q: 'Der <strong>' + f.name + '</strong> (m = ' + de(f.m) + ' kg) beschleunigt mit a<sub>S</sub> ≈ ' + de(a, 2) + ' m/s². Welche Kraft ist dafür nötig? Und wie lange bräuchte ein frei fallender Körper, um 100 km/h zu erreichen?',
+            note: 'Widerstandskräfte bleiben unberücksichtigt. Kraft auf ganze N, Zeit auf zwei Nachkommastellen.',
+            fields: [
+                { label: 'Kraft F = m · a', unit: 'N', ans: T(F), tol: relTol(F, 0.005) },
+                { label: 'Zeit des freien Körpers bis 100 km/h', unit: 's', ans: T(tk), tol: 20,
+                  errors: [{ v: T(100 / g0), msg: 'Rechnen Sie 100 km/h zuerst in m/s um.', tol: 20 }, { v: T(g0 / V100), msg: 'Umstellen: t = v / a.', tol: 5 }] }
+            ],
+            hint: 'F = m · a. Für die Zeit: v = a · t umstellen: t = v / a, hier mit a = g.',
+            explanation: 'F = ' + de(f.m) + ' kg · ' + de(a, 2) + ' m/s² ≈ <strong>' + de(Math.round(F)) + ' N</strong>.<br>' +
+                         't = 27,78 m/s / 9,81 m/s² ≈ <strong>' + de(tk, 2) + ' s</strong>. Ein frei fallender Körper wäre nach ' + de(tk, 2) + ' s schon 100 km/h schnell.'
+        };
+    },
+    {
+        type: 'mc', shuffle: true, level: 'Begründen',
+        q: 'Sportwagen und fallender Körper starten beide aus der Ruhe. In derselben Zeit legt der fallende Körper fast <strong>doppelt</strong> so viel Strecke zurück. Warum?',
+        options: ['Weil die Strecke proportional zu t² ist.',
+                  'Weil bei v₀ = 0 gilt: x = ½ · a · t². Bei gleicher Zeit ist die Strecke proportional zu a. Und g ist etwa doppelt so groß wie a<sub>S</sub>.',
+                  'Weil die Gewichtskraft des Körpers größer ist als die Antriebskraft des Autos.',
+                  'Weil der fallende Körper leichter ist als das Auto.'],
+        correct: 1,
+        wrongHints: {
+            'Weil die Strecke proportional zu t² ist.': 'Das stimmt zwar. Aber die Zeit ist für beide gleich. Was ist dann noch verschieden?',
+            'Weil die Gewichtskraft des Körpers größer ist als die Antriebskraft des Autos.': 'Kräfte allein sagen nichts. Entscheidend ist a = F / m.',
+            'Weil der fallende Körper leichter ist als das Auto.': 'Die Masse spielt beim freien Fall keine Rolle. Alle Körper fallen mit g.'
+        },
+        hint: 'Vergleichen Sie die beiden Formeln x<sub>S</sub> = ½ · a<sub>S</sub> · t² und x<sub>K</sub> = ½ · g · t².',
+        explanation: '½ und t² sind bei beiden gleich. Es bleibt: x<sub>K</sub> / x<sub>S</sub> = g / a<sub>S</sub> = 9,81 / 4,96 ≈ <strong>1,98</strong>. Fast doppelte Beschleunigung, also fast doppelte Strecke.'
+    },
+    function () {
+        let sel;
+        do { sel = pickN(FAHRZEUGE, 3); } while (sel.some((x, k) => sel.some((y, j) => j !== k && Math.abs(x.t - y.t) < 0.6)) ||
+                                                  sel.some(x => Math.abs(V100 / x.t - g0) < 0.8));
+        const all = sel.map(x => ({ n: x.name + ' (0–100 km/h in ' + de(x.t) + ' s)', a: V100 / x.t }))
+            .concat([{ n: 'frei fallender Körper', a: g0 }]).sort((p, q) => q.a - p.a);
+        return {
+            type: 'order', q: 'Sortieren Sie nach der Beschleunigung. Die größte kommt nach oben.',
+            top: 'größte Beschleunigung', bottom: 'kleinste Beschleunigung',
+            steps: all.map(x => x.n),
+            hint: 'a = Δv / Δt. Alle erreichen 100 km/h ≈ 27,78 m/s. Kürzere Zeit heißt größere Beschleunigung. Der freie Fall hat a = 9,81 m/s².',
+            explanation: all.map(x => x.n + ': a ≈ <strong>' + de(x.a, 2) + ' m/s²</strong>').join('<br>')
+        };
+    }
+],
+// ---------------------------------------------------------------- Modul 7
+7: [
+    function () {
+        const vc = rnd([15, 40]), vb = rnd([30, 45]), tb = rnd([4, 5]);
+        const mot = shuffle([
+            { name: 'freier Fall', pts: [[0, 0], [5, 49.05]] },
+            { name: 'Sportwagen beim Beschleunigen', pts: [[0, 0], [5, 24.8]] },
+            { name: 'Fahrt mit konstanter Geschwindigkeit', pts: [[0, vc], [5, vc]] },
+            { name: 'Abbremsen bis zum Stillstand', pts: tb === 5 ? [[0, vb], [5, 0]] : [[0, vb], [tb, 0], [5, 0]], at: 0 }
+        ]);
+        const L = ['A', 'B', 'C', 'D'];
+        const svg = vtSvg(mot.map((m, k) => ({ lab: L[k], col: COL[k], pts: m.pts, at: m.at })));
+        return {
+            type: 'match', svg, shuffle: false,
+            q: 'Das v-t-Diagramm zeigt vier Bewegungen. Welche Gerade gehört zu welcher Bewegung?',
+            options: ['freier Fall', 'Sportwagen beim Beschleunigen', 'Fahrt mit konstanter Geschwindigkeit', 'Abbremsen bis zum Stillstand'],
+            items: mot.map((m, k) => ({ left: 'Gerade ' + L[k], answer: m.name })),
+            hint: 'Waagerecht: v bleibt gleich. Fallend: Der Körper wird langsamer. Steigend: Je steiler, desto größer a. Der freie Fall hat a ≈ 10 m/s².',
+            explanation: mot.map((m, k) => 'Gerade ' + L[k] + ': <strong>' + m.name + '</strong>').join('<br>') +
+                         '<br>Der freie Fall ist steiler (a = 9,81 m/s²) als der Sportwagen (a ≈ 4,96 m/s²).'
+        };
+    },
+    function () {
+        let v0, a, v1;
+        do { v0 = rnd([0, 0, 5, 10]); a = rnd([2, 3, 4, 5, 6, 7, 8]); v1 = v0 + 5 * a; } while (v1 > 50);
+        const x = (v0 + v1) / 2 * 5;
+        const svg = vtSvg([{ col: COL[0], pts: [[0, v0], [5, v1]], dots: true }]);
+        return {
+            type: 'num', svg,
+            q: 'Lesen Sie aus dem Diagramm ab. Berechnen Sie die Beschleunigung und die Strecke, die der Körper in den 5 Sekunden zurücklegt.',
+            note: 'Die Punkte liegen genau auf den Gitterlinien (Abstand 5 m/s). Strecke auf eine Nachkommastelle.',
+            fields: [
+                { label: 'Geschwindigkeit bei t = 0', unit: 'm/s', ans: T(v0) },
+                { label: 'Geschwindigkeit bei t = 5 s', unit: 'm/s', ans: T(v1) },
+                { label: 'Beschleunigung a (Steigung)', unit: 'm/s²', ans: T(a), tol: 50,
+                  errors: [{ v: T(v1 / 5), msg: 'Δv = v<sub>Ende</sub> − v<sub>Anfang</sub>. Die Gerade startet nicht bei null.', tol: 50 }] },
+                { label: 'Strecke x (Fläche unter der Geraden)', unit: 'm', ans: T(x), tol: relTol(x, 0.01),
+                  errors: [{ v: T(v1 * 5), msg: 'Das wäre ein Rechteck. Die Fläche unter einer schrägen Geraden ist ein Dreieck (bzw. Trapez).', tol: relTol(v1 * 5, 0.01) },
+                           { v: T(v1 * 5 / 2), msg: 'Bei v₀ ≠ 0 kommt unter dem Dreieck noch ein Rechteck dazu: v₀ · t.', tol: relTol(v1 * 5 / 2, 0.01) }] }
+            ],
+            hint: 'Steigung: a = Δv / Δt. Fläche: Rechteck v₀ · t plus Dreieck ½ · Δv · t.',
+            explanation: 'a = (' + v1 + ' m/s − ' + v0 + ' m/s) / 5 s = <strong>' + a + ' m/s²</strong>.<br>' +
+                         'x = ' + (v0 ? v0 + ' m/s · 5 s + ' : '') + '½ · ' + (v1 - v0) + ' m/s · 5 s = <strong>' + de(x) + ' m</strong>.'
+        };
+    },
+    function () {
+        const a = V100 / 5.6;
+        const kandidaten = shuffle([
+            { pts: [[0, 0], [5, 5 * a]], ok: true },
+            { pts: [[0, 0], [2.8, 50]], hint: 'Diese Gerade hätte a ≈ 17,86 m/s². So kommt man heraus, wenn man 100 km/h nicht in m/s umrechnet.' },
+            { pts: [[0, V100], [5, V100]], at: 0, hint: 'Eine waagerechte Gerade bedeutet konstante Geschwindigkeit. Der Wagen startet aber aus dem Stand.' },
+            { pts: [[0, 0], [5, 49.05]], hint: 'Diese Gerade hat die Steigung 9,81 m/s². Das ist der freie Fall.' }
+        ]);
+        const L = ['A', 'B', 'C', 'D'];
+        const svg = vtSvg(kandidaten.map((k, i) => ({ lab: L[i], col: COL[i], pts: k.pts, at: k.at })));
+        const options = L.map(x => 'Gerade ' + x);
+        const wrongHints = {};
+        kandidaten.forEach((k, i) => { if (!k.ok) wrongHints[options[i]] = k.hint; });
+        return {
+            type: 'mc', svg, q: 'Der Sportwagen beschleunigt in 5,6 s von 0 auf 100 km/h. Welche Gerade zeigt seine Bewegung richtig?',
+            options, correct: kandidaten.findIndex(k => k.ok), wrongHints,
+            hint: 'Berechnen Sie a<sub>S</sub> = 27,78 m/s / 5,6 s. Welche Geschwindigkeit hat der Wagen nach 5 s?',
+            explanation: 'a<sub>S</sub> ≈ 4,96 m/s². Nach 5 s gilt v = 4,96 m/s² · 5 s ≈ <strong>24,8 m/s</strong>. Die Gerade startet im Ursprung und steigt bis etwa 25 m/s bei 5 s.'
+        };
+    },
+    {
+        type: 'mc', shuffle: true,
+        q: 'Was bedeutet die <strong>Fläche</strong> unter der Geraden im v-t-Diagramm?',
+        options: ['die zurückgelegte Strecke', 'die Beschleunigung', 'die Endgeschwindigkeit', 'die benötigte Kraft'],
+        correct: 0,
+        wrongHints: { 'die Beschleunigung': 'Die Beschleunigung ist die Steigung der Geraden.' },
+        hint: 'Rechnen Sie die Einheiten: Fläche = Geschwindigkeit · Zeit = m/s · s = …?',
+        explanation: 'Fläche = v · t, Einheit m/s · s = <strong>m</strong>. Die Fläche ist die zurückgelegte <strong>Strecke</strong>. Beim Start aus der Ruhe ist sie ein Dreieck: x = ½ · v · t. Das passt zu x = ½ · a · t², denn v = a · t.'
+    },
+    richtigFalsch([
+        { left: 'Eine waagerechte Linie im v-t-Diagramm bedeutet: Der Körper steht still.', answer: 'falsch' },
+        { left: 'Je steiler die Gerade, desto größer die Beschleunigung.', answer: 'richtig' },
+        { left: 'Die Fläche unter der Geraden ist die zurückgelegte Strecke.', answer: 'richtig' },
+        { left: 'Eine Gerade durch den Ursprung bedeutet: Der Körper startet aus der Ruhe.', answer: 'richtig' },
+        { left: 'Eine fallende Gerade bedeutet: Der Körper wird langsamer.', answer: 'richtig' },
+        { left: 'Die Steigung der Geraden ist die Geschwindigkeit.', answer: 'falsch' },
+        { left: 'Bei gleichmäßiger Beschleunigung ist der Graph im v-t-Diagramm eine Gerade.', answer: 'richtig' }
+    ], 5, 'Im v-t-Diagramm gilt: Steigung = Beschleunigung, Fläche = Strecke. Waagerecht heißt konstante Geschwindigkeit (nicht Stillstand). Stillstand ist die Linie bei v = 0.')
+]
+};
+
+// =====================================================================
+// Aufgaben-Engine für die FOS-Lernmodule (Aufbau wie die C#-Vorlage)
+// Aufgabentypen: mc (Auswahl), num (Zahlen eingeben, auch mit Auswahlfeldern),
+//                match (Zuordnen), order (Reihenfolge)
+// Eine Aufgabe ist ein Objekt oder eine Funktion, die ein Objekt liefert.
+// Funktionen erzeugen bei jedem Öffnen neue Zahlen ("Neue Zahlen"-Knopf).
+// num-Felder: ans in Tausendsteln der Einheit (9,81 -> 9810), tol = Spielraum.
+// Pro Modul legt tasks.js fest: BASIC (Grundlagen) und ADVANCED (gesperrt).
+// =====================================================================
+
+let completedModules = new Set();
+let basicQuizPassed = false;
+let current = {};
+
+// ---------- Hilfsfunktionen ----------
+function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function rint(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+function shuffle(a) {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+function pickN(arr, n) { return shuffle(arr).slice(0, n); }
+
+function parseNum(s) {
+    s = (s || '').trim().replace(/\s+/g, '')
+        .replace(/(N\/kg|m\/s²|m\/s\^2|m\/s2|m\/s|km\/h|kN|km|kg|N|m|g|s|%)$/, '')   // angehängte Einheit ignorieren
+        .replace(/[−–]/g, '-').replace(',', '.');
+    if (!/^[+-]?(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
+    return parseFloat(s);
+}
+
+const TYPE_LABEL = {
+    mc: '✅ Auswählen',
+    num: '🔢 Rechnen',
+    match: '🔗 Zuordnen',
+    order: '↕️ Reihenfolge'
+};
+const TYPE_NOTE = {
+    mc: 'Klicken Sie die richtige Antwort an.',
+    num: 'Tippen Sie Ihre Ergebnisse ein. Komma oder Punkt ist egal.',
+    match: 'Wählen Sie bei jeder Zeile die passende Antwort aus.',
+    order: 'Bringen Sie die Einträge mit ▲ und ▼ in die richtige Reihenfolge.'
+};
+
+// ---------- Aufgabe vorbereiten ----------
+function resolveTask(def) {
+    const generated = (typeof def === 'function');
+    const t = generated ? def() : JSON.parse(JSON.stringify(def));
+    t.regen = generated;
+    if (t.type === 'match') {
+        const items = (t.shuffle === false) ? t.items : shuffle(t.items);
+        t.fields = items.map(it => ({ label: it.left, kind: 'select', options: t.options, ans: it.answer, errors: it.errors }));
+    }
+    // typische Fehlerwerte, die zufällig gleich der Lösung sind, entfernen
+    (t.fields || []).forEach(f => { if (f.errors) f.errors = f.errors.filter(e => e.v !== f.ans); });
+    if (t.type === 'order') {
+        let cur;
+        do { cur = shuffle(t.steps.map((s, k) => k)); } while (cur.every((v, k) => v === k));
+        t.cur = cur;
+    }
+    if (t.type === 'mc' && t.shuffle) {
+        const idx = shuffle(t.options.map((o, k) => k));
+        t.options = idx.map(k => t.options[k]);
+        t.correct = idx.indexOf(t.correct);
+    }
+    return t;
+}
+
+function qDiv(n, i) { return document.querySelector('.quiz-question[data-module="' + n + '"][data-question="' + i + '"]'); }
+
+// ---------- Darstellung ----------
+function renderTask(n, i) {
+    const t = current[n][i];
+    const id = n + '_' + i;
+    let h = '<div class="quiz-question task-' + t.type + '" data-module="' + n + '" data-question="' + i + '">';
+    h += '<div class="task-head"><span class="task-type">' + TYPE_LABEL[t.type] + '</span>' +
+         (t.level ? '<span class="task-level">⭐ ' + t.level + '</span>' : '') + '</div>';
+    h += '<p>' + (i + 1) + '. ' + t.q + '</p>';
+    if (t.svg) h += '<div class="sketch">' + t.svg + '</div>';
+    h += '<div class="task-note">' + (t.note || TYPE_NOTE[t.type]) + '</div>';
+
+    if (t.type === 'mc') {
+        t.options.forEach((opt, j) => {
+            h += '<div class="quiz-option" onclick="answerMC(' + n + ',' + i + ',' + j + ')">' +
+                 '<input type="radio" name="q' + id + '" id="q' + id + '_' + j + '">' +
+                 '<label for="q' + id + '_' + j + '">' + opt + '</label></div>';
+        });
+    } else if (t.type === 'order') {
+        if (t.top) h += '<div class="order-end">▲ ' + t.top + '</div>';
+        h += '<ol class="order-list">';
+        t.cur.forEach((si, pos) => {
+            h += '<li class="order-item"><span class="order-text">' + t.steps[si] + '</span>' +
+                 '<span class="order-btns">' +
+                 '<button type="button" onclick="moveStep(' + n + ',' + i + ',' + pos + ',-1)" aria-label="nach oben"' + (pos === 0 ? ' disabled' : '') + '>▲</button>' +
+                 '<button type="button" onclick="moveStep(' + n + ',' + i + ',' + pos + ',1)" aria-label="nach unten"' + (pos === t.cur.length - 1 ? ' disabled' : '') + '>▼</button>' +
+                 '</span></li>';
+        });
+        h += '</ol>';
+        if (t.bottom) h += '<div class="order-end">▼ ' + t.bottom + '</div>';
+    } else {
+        h += '<div class="fields">';
+        t.fields.forEach((f, k) => {
+            const fid = 'in' + id + '_' + k;
+            h += '<div class="field-row" id="row' + id + '_' + k + '">' +
+                 '<label class="field-label" for="' + fid + '">' + f.label + '</label><div class="field-input">';
+            if (f.kind === 'select') {
+                h += '<select id="' + fid + '"><option value="">– bitte wählen –</option>' +
+                     f.options.map(o => '<option>' + o + '</option>').join('') + '</select>';
+            } else {
+                if (f.prefix) h += '<span class="field-pre">' + f.prefix + '</span>';
+                h += '<input type="text" inputmode="decimal" autocomplete="off" id="' + fid + '"' +
+                     (f.small ? ' class="small"' : '') +
+                     ' onkeydown="if(event.key===\'Enter\')checkTask(' + n + ',' + i + ')">';
+                h += '<span class="field-unit">' + (f.unit || '') + '</span>';
+            }
+            h += '</div><div class="field-msg"></div></div>';
+        });
+        h += '</div>';
+    }
+
+    h += '<div class="task-buttons">';
+    if (t.type !== 'mc') h += '<button type="button" class="btn-check" onclick="checkTask(' + n + ',' + i + ')">Prüfen</button>';
+    if (t.regen) h += '<button type="button" class="btn-new" onclick="newTask(' + n + ',' + i + ')">🎲 ' + (t.type === 'num' ? 'Neue Zahlen' : 'Neue Aufgabe') + '</button>';
+    h += '</div>';
+    h += '<div class="quiz-feedback" data-feedback="' + n + '-' + i + '"></div></div>';
+    return h;
+}
+
+function setResult(n, i, ok, extra) {
+    const t = current[n][i];
+    const qd = qDiv(n, i);
+    const fb = qd.querySelector('.quiz-feedback');
+    fb.classList.add('show');
+    fb.classList.toggle('correct', ok);
+    fb.classList.toggle('wrong', !ok);
+    qd.classList.toggle('correct', ok);
+    qd.classList.toggle('wrong', !ok);
+    fb.innerHTML = ok ? '✓ Richtig! ' + t.explanation
+                      : '✗ Noch nicht ganz richtig. ' + (extra || '') + 'Hinweis: ' + t.hint;
+    if (ok) qd.querySelectorAll('input[type=text], select').forEach(el => el.disabled = true);
+}
+
+// ---------- Antworten prüfen ----------
+function answerMC(n, i, j) {
+    const t = current[n][i];
+    const qd = qDiv(n, i);
+    qd.querySelectorAll('input[type="radio"]').forEach((r, k) => { r.checked = (k === j); });
+    const e = (j !== t.correct) && t.wrongHints && t.wrongHints[t.options[j]];
+    setResult(n, i, j === t.correct, e ? e + ' ' : '');
+}
+
+function checkTask(n, i) {
+    const t = current[n][i];
+    const qd = qDiv(n, i);
+    let ok = true, empty = false;
+
+    if (t.type === 'order') {
+        ok = t.cur.every((v, k) => v === k);
+        qd.querySelectorAll('.order-item').forEach((li, pos) => {
+            li.classList.toggle('ok', t.cur[pos] === pos);
+            li.classList.toggle('bad', t.cur[pos] !== pos);
+        });
+        setResult(n, i, ok);
+        return;
+    }
+
+    t.fields.forEach((f, k) => {
+        const row = document.getElementById('row' + n + '_' + i + '_' + k);
+        const el = row.querySelector('input, select');
+        const msgEl = row.querySelector('.field-msg');
+        let good = false, msg = '';
+        if (f.kind === 'select') {
+            if (!el.value) { msg = 'Bitte wählen Sie etwas aus.'; empty = true; }
+            else {
+                good = (el.value === f.ans);
+                const e = !good && f.errors && f.errors.find(e => e.v === el.value);
+                if (e) msg = e.msg;
+            }
+        } else {
+            const v = parseNum(el.value);
+            if (el.value.trim() === '') { msg = 'Bitte tragen Sie eine Zahl ein.'; empty = true; }
+            else if (isNaN(v)) { msg = 'Das ist keine Zahl. Beispiel: 9,81 (ohne Zehnerpotenz, die steht schon da).'; }
+            else {
+                const x = Math.round(v * 1000);
+                good = f.tol ? Math.abs(x - f.ans) <= f.tol : (x === f.ans);
+                if (!good) {
+                    // Fehlerwerte: ebenfalls mit Spielraum (etol) vergleichen
+                    const e = f.errors && f.errors.find(e => Math.abs(e.v - x) <= (e.tol !== undefined ? e.tol : (f.tol || 0)));
+                    if (e) msg = e.msg;
+                }
+            }
+        }
+        row.classList.toggle('ok', good);
+        row.classList.toggle('bad', !good);
+        msgEl.textContent = msg;
+        if (!good) ok = false;
+    });
+    setResult(n, i, ok, empty ? 'Es fehlen noch Eingaben. ' : '');
+}
+
+function moveStep(n, i, pos, dir) {
+    const t = current[n][i];
+    const p2 = pos + dir;
+    if (p2 < 0 || p2 >= t.cur.length) return;
+    [t.cur[pos], t.cur[p2]] = [t.cur[p2], t.cur[pos]];
+    qDiv(n, i).outerHTML = renderTask(n, i);
+}
+
+function newTask(n, i) {
+    current[n][i] = resolveTask(TASKS[n][i]);
+    qDiv(n, i).outerHTML = renderTask(n, i);
+}
+
+// ---------- Module öffnen und abschließen ----------
+function openModule(moduleNum) {
+    if (ADVANCED.indexOf(moduleNum) >= 0 && !basicQuizPassed) {
+        alert('🔒 Dieses Modul ist noch gesperrt. Schließen Sie zuerst die Module ' + BASIC[0] + ' bis ' + BASIC[BASIC.length - 1] + ' ab!');
+        return;
+    }
+    document.getElementById('module-grid').style.display = 'none';
+    const module = modules[moduleNum];
+    current[moduleNum] = TASKS[moduleNum].map(resolveTask);
+
+    let html = '<div class="module-content active">' +
+               '<h2>' + module.title + '</h2>' + module.content +
+               '<div class="quiz-section"><h3>📝 Verständnis-Check</h3>';
+    for (let i = 0; i < current[moduleNum].length; i++) html += renderTask(moduleNum, i);
+    html += '</div>' +
+            '<button class="btn btn-back" onclick="backToOverview()">← Übersicht</button>' +
+            '<button class="btn" onclick="completeModule(' + moduleNum + ')">Modul abschließen →</button>' +
+            '</div>';
+    document.getElementById('module-content-container').innerHTML = html;
+    window.scrollTo(0, 0);
+}
+
+function completeModule(moduleNum) {
+    for (let i = 0; i < current[moduleNum].length; i++) {
+        const qd = qDiv(moduleNum, i);
+        if (!qd || !qd.classList.contains('correct')) {
+            alert('Aufgabe ' + (i + 1) + ' ist noch nicht richtig gelöst. Lösen Sie zuerst alle Aufgaben. Dann können Sie das Modul abschließen.');
+            qd.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+    }
+    completedModules.add(moduleNum);
+    checkUnlocks();
+    updateProgress();
+    alert('🎉 Modul ' + moduleNum + ' geschafft!');
+    backToOverview();
+}
+
+function backToOverview() {
+    document.getElementById('module-grid').style.display = 'grid';
+    document.getElementById('module-content-container').innerHTML = '';
+    window.scrollTo(0, 0);
+}
+
+function checkUnlocks() {
+    if (BASIC.every(m => completedModules.has(m)) && !basicQuizPassed) {
+        basicQuizPassed = true;
+        alert('🔓 Stark! Sie haben die Grundlagen geschafft. Die Fortgeschrittenen-Module ' + ADVANCED.join(', ').replace(/, (\d+)$/, ' und $1') + ' sind jetzt frei!');
+        ADVANCED.forEach(m => {
+            const card = document.getElementById('card-' + m);
+            card.classList.remove('locked');
+            card.querySelector('.module-description').textContent = UNLOCK_TEXT[m];
+        });
+    }
+}
+
+function updateProgress() {
+    const total = Object.keys(modules).length;
+    const bar = document.getElementById('progress');
+    bar.style.width = (completedModules.size / total * 100) + '%';
+    bar.textContent = completedModules.size + ' von ' + total + ' Modulen abgeschlossen';
+    completedModules.forEach(m => {
+        const card = document.getElementById('card-' + m);
+        if (card) card.classList.add('completed');
+    });
+    if (completedModules.size === total) document.getElementById('badge').classList.add('show');
+}
+
+    </script>
+</body>
+</html>
