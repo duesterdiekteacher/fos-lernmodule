@@ -7,6 +7,7 @@ REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "kraft-beschleunigung")
 CSS_BASE = open(os.path.join(HERE, "..", "stil_vorlage.css"), encoding="utf-8").read()
 ENGINE = open(os.path.join(HERE, "..", "engine.js"), encoding="utf-8").read()
+ENGINE_EXTRA = open(os.path.join(HERE, "..", "engine_extra.js"), encoding="utf-8").read()
 TASKS_JS = open(os.path.join(HERE, "tasks.js"), encoding="utf-8").read()
 
 css = CSS_BASE.replace("grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));",
@@ -54,6 +55,53 @@ css += """
             .formula-grid { grid-template-columns: 1fr; gap: 0; }
             .formula-grid .fname { margin-top: 8px; }
             .gesetz { font-size: 17px; padding: 12px 14px; }
+        }
+        /* ---------- kreative Aufgabentypen ---------- */
+        .debate { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+        .bubble { position: relative; max-width: 85%; padding: 12px 16px; border-radius: 14px; font-size: 17px; line-height: 1.55; color: #f1f5f9; }
+        .bubble.l { align-self: flex-start; background: #1e3a5f; border: 2px solid #38bdf8; border-bottom-left-radius: 2px; }
+        .bubble.r { align-self: flex-end; background: #3b2a0a; border: 2px solid #f59e0b; border-bottom-right-radius: 2px; }
+        .bubble .who { display: block; font-weight: bold; font-size: 14px; margin-bottom: 4px; color: #cbd5e1; }
+        .predict-msg { margin: 10px 0; color: #e0f2fe; font-size: 16px; line-height: 1.6; }
+        .predict-msg:empty { display: none; }
+        .quiz-option.locked-opt { cursor: default; opacity: 0.85; }
+        .sim-box { background: #0f172a; border: 2px solid #334155; border-radius: 10px; padding: 12px; margin: 10px 0; text-align: center; }
+        .sim svg { width: 100%; max-width: 560px; height: auto; }
+        .sim-box .btn-new { margin-top: 8px; }
+        .follow { margin-top: 14px; border-top: 1px dashed #475569; padding-top: 12px; }
+        .follow-q { font-weight: bold; color: #f8fafc; }
+        .lab { background: #0f172a; border: 2px solid #334155; border-radius: 10px; padding: 14px; }
+        .lab-view svg { width: 100%; max-width: 560px; height: auto; display: block; margin: 0 auto; }
+        .lab-out { text-align: center; font-size: 19px; color: #e2e8f0; margin: 8px 0 12px 0; }
+        .lab-slider { margin: 10px 0; }
+        .lab-slider label { display: block; color: #cbd5e1; font-size: 16px; margin-bottom: 4px; }
+        .lab-slider input[type=range] { width: 100%; accent-color: #38bdf8; height: 28px; }
+        .missions { list-style: none; margin: 14px 0 0 0; padding: 0; }
+        .missions li { padding: 8px 10px 8px 36px; margin-bottom: 6px; border-radius: 8px; background: #1e293b; position: relative; color: #e2e8f0; line-height: 1.5; }
+        .missions li::before { content: "☐"; position: absolute; left: 10px; color: #94a3b8; }
+        .missions li.done { background: #14532d; }
+        .missions li.done::before { content: "✓"; color: #4ade80; font-weight: bold; }
+        .pens { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+        .pen { background: #1e293b; color: #f1f5f9; border: 2px solid var(--pc); border-radius: 999px; padding: 8px 16px; font-size: 16px; cursor: pointer; }
+        .pen.active { background: var(--pc); color: #0f172a; font-weight: bold; }
+        .draw-area { cursor: crosshair; }
+        .draw-msgs { list-style: none; padding: 0; margin: 6px 0 0 0; }
+        .draw-msgs li { padding: 4px 0; }
+        .draw-msgs li.ok { color: #4ade80; } .draw-msgs li.bad { color: #fecaca; }
+        .text-answer { width: 100%; background: #0f172a; color: #f8fafc; border: 2px solid #475569; border-radius: 8px; padding: 10px; font-size: 17px; font-family: inherit; line-height: 1.6; resize: vertical; }
+        .text-answer:focus { outline: none; border-color: #38bdf8; }
+        .model { background: #0f2a3b; border: 1px solid #38bdf8; border-radius: 10px; padding: 14px 16px; margin-top: 12px; }
+        .model h4 { color: #7dd3fc; margin-bottom: 6px; }
+        .model p { color: #e0f2fe; line-height: 1.6; }
+        .model-q { margin-top: 10px; font-weight: bold; }
+        .checklist { list-style: none; padding: 0; margin: 6px 0 0 0; }
+        .checklist li { margin: 6px 0; color: #e2e8f0; }
+        .checklist input { transform: scale(1.3); margin-right: 8px; }
+        .mini-lab { display: block; font-weight: bold; color: #cbd5e1; margin-bottom: 2px; }
+        svg.mini { width: 200px; max-width: 100%; height: auto; display: block; }
+        .quiz-question > .sketch svg.mini { width: 360px; }
+        @media (max-width: 600px) {
+            .bubble { max-width: 95%; font-size: 16px; }
         }
         /* ---------- Aufgabentypen ---------- */
         .task-head { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
@@ -615,6 +663,7 @@ const modules = {json.dumps(data, ensure_ascii=False, indent=2)};
 
 {TASKS_JS}
 {ENGINE}
+{ENGINE_EXTRA}
     </script>
 </body>
 </html>

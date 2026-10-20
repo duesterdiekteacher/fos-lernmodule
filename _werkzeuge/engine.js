@@ -37,14 +37,18 @@ const TYPE_LABEL = {
     mc: '✅ Auswählen',
     num: '🔢 Rechnen',
     match: '🔗 Zuordnen',
-    order: '↕️ Reihenfolge'
+    order: '↕️ Reihenfolge',
+    debate: '💬 Wer hat recht?'
 };
 const TYPE_NOTE = {
     mc: 'Klicken Sie die richtige Antwort an.',
     num: 'Tippen Sie Ihre Ergebnisse ein. Komma oder Punkt ist egal.',
     match: 'Wählen Sie bei jeder Zeile die passende Antwort aus.',
-    order: 'Bringen Sie die Einträge mit ▲ und ▼ in die richtige Reihenfolge.'
+    order: 'Bringen Sie die Einträge mit ▲ und ▼ in die richtige Reihenfolge.',
+    debate: 'Entscheiden Sie: Wer hat recht? Und warum?'
 };
+// Zusätzliche Aufgabentypen (engine_extra.js) tragen sich in CUSTOM ein.
+function customType(t) { return (typeof CUSTOM !== 'undefined') && CUSTOM[t.type]; }
 
 // ---------- Aufgabe vorbereiten ----------
 function resolveTask(def) {
@@ -76,14 +80,17 @@ function qDiv(n, i) { return document.querySelector('.quiz-question[data-module=
 function renderTask(n, i) {
     const t = current[n][i];
     const id = n + '_' + i;
+    const C = customType(t);
     let h = '<div class="quiz-question task-' + t.type + '" data-module="' + n + '" data-question="' + i + '">';
-    h += '<div class="task-head"><span class="task-type">' + TYPE_LABEL[t.type] + '</span>' +
+    h += '<div class="task-head"><span class="task-type">' + (C ? C.label : TYPE_LABEL[t.type]) + '</span>' +
          (t.level ? '<span class="task-level">⭐ ' + t.level + '</span>' : '') + '</div>';
     h += '<p>' + (i + 1) + '. ' + t.q + '</p>';
     if (t.svg) h += '<div class="sketch">' + t.svg + '</div>';
-    h += '<div class="task-note">' + (t.note || TYPE_NOTE[t.type]) + '</div>';
+    h += '<div class="task-note">' + (t.note || (C ? C.note : TYPE_NOTE[t.type])) + '</div>';
 
-    if (t.type === 'mc') {
+    if (C) {
+        h += C.render(t, n, i, id);
+    } else if (t.type === 'mc') {
         t.options.forEach((opt, j) => {
             h += '<div class="quiz-option" onclick="answerMC(' + n + ',' + i + ',' + j + ')">' +
                  '<input type="radio" name="q' + id + '" id="q' + id + '_' + j + '">' +
@@ -123,8 +130,8 @@ function renderTask(n, i) {
     }
 
     h += '<div class="task-buttons">';
-    if (t.type !== 'mc') h += '<button type="button" class="btn-check" onclick="checkTask(' + n + ',' + i + ')">Prüfen</button>';
-    if (t.regen) h += '<button type="button" class="btn-new" onclick="newTask(' + n + ',' + i + ')">🎲 ' + (t.type === 'num' ? 'Neue Zahlen' : 'Neue Aufgabe') + '</button>';
+    if (t.type !== 'mc' && !(C && !C.checkButton)) h += '<button type="button" class="btn-check" onclick="checkTask(' + n + ',' + i + ')">Prüfen</button>';
+    if (t.regen && !t.noRegen) h += '<button type="button" class="btn-new" onclick="newTask(' + n + ',' + i + ')">🎲 ' + (t.type === 'num' ? 'Neue Zahlen' : 'Neue Aufgabe') + '</button>';
     h += '</div>';
     h += '<div class="quiz-feedback" data-feedback="' + n + '-' + i + '"></div></div>';
     return h;
@@ -139,7 +146,7 @@ function setResult(n, i, ok, extra) {
     fb.classList.toggle('wrong', !ok);
     qd.classList.toggle('correct', ok);
     qd.classList.toggle('wrong', !ok);
-    fb.innerHTML = ok ? '✓ Richtig! ' + t.explanation
+    fb.innerHTML = ok ? (t.doneOnly ? '✓ Erledigt! ' : '✓ Richtig! ') + t.explanation
                       : '✗ Noch nicht ganz richtig. ' + (extra || '') + 'Hinweis: ' + t.hint;
     if (ok) qd.querySelectorAll('input[type=text], select').forEach(el => el.disabled = true);
 }
@@ -157,6 +164,8 @@ function checkTask(n, i) {
     const t = current[n][i];
     const qd = qDiv(n, i);
     let ok = true, empty = false;
+    const C = customType(t);
+    if (C && C.check) { C.check(t, n, i); return; }
 
     if (t.type === 'order') {
         ok = t.cur.every((v, k) => v === k);
