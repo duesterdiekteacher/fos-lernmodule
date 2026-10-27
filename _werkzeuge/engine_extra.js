@@ -226,3 +226,6 @@ function textReveal(n, i) {
     qd.querySelector('.model').style.display = 'block';
     setResult(n, i, true);
 }
+
+// Vektor-Zeichnen (engine_vektor.js, vor tasks.js eingebunden) anmelden
+if (typeof VECTOR_TYPE !== 'undefined') CUSTOM.vector = VECTOR_TYPE;
