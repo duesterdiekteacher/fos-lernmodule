@@ -195,7 +195,7 @@ function checkTask(n, i) {
             else if (isNaN(v)) { msg = 'Das ist keine Zahl. Beispiel: 9,81 (ohne Zehnerpotenz, die steht schon da).'; }
             else {
                 const x = Math.round(v * 1000);
-                good = f.tol ? Math.abs(x - f.ans) <= f.tol : (x === f.ans);
+                good = [f.ans].concat(f.alt || []).some(a => f.tol ? Math.abs(x - a) <= f.tol : (x === a));   // alt: gleichwertige Lösungen
                 if (!good) {
                     // Fehlerwerte: ebenfalls mit Spielraum (etol) vergleichen
                     const e = f.errors && f.errors.find(e => Math.abs(e.v - x) <= (e.tol !== undefined ? e.tol : (f.tol || 0)));

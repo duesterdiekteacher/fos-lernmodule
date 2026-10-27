@@ -253,7 +253,7 @@ QUAD_REGELN = '''<div class="quad">
 <div><strong>II. Quadrant</strong><br>F<sub>x</sub> −, F<sub>y</sub> +<br>α = 180° − α′</div>
 <div><strong>I. Quadrant</strong><br>F<sub>x</sub> +, F<sub>y</sub> +<br>α = α′</div>
 <div><strong>III. Quadrant</strong><br>F<sub>x</sub> −, F<sub>y</sub> −<br>α = 180° + α′</div>
-<div><strong>IV. Quadrant</strong><br>F<sub>x</sub> +, F<sub>y</sub> −<br>α = 360° − α′</div>
+<div><strong>IV. Quadrant</strong><br>F<sub>x</sub> +, F<sub>y</sub> −<br>α = 360° − α′<br>oder α = −α′</div>
 </div>'''
 
 
@@ -395,6 +395,15 @@ M[3] = dict(
   ["② Hilfswinkel", "α′ = arctan(135,17 / 163,69) = 39,55°"],
   ["③ Winkel", "α = 180° − 39,55° = 140,45°"]])}
 {box("⚠️ Achtung", "Tippt man arctan(135,17 / −163,69) direkt ein, zeigt der Rechner −39,55°. Das wäre der IV. Quadrant, also falsch. Darum immer zuerst den Quadranten bestimmen.")}
+<h3>Negative Winkel</h3>
+<p>Ein Winkel kann auch <strong>negativ</strong> sein. Ein negativer Winkel bedeutet: Man trägt ihn ab der positiven x-Achse <strong>im Uhrzeigersinn</strong> ein.</p>
+<ul>
+<li>α = −30° zeigt in dieselbe Richtung wie α = 330°.</li>
+<li>α = −90° zeigt senkrecht nach unten, genau wie α = 270°.</li>
+</ul>
+<p>Im IV. Quadranten ist das besonders praktisch: Statt α = 360° − α′ schreibt man einfach <strong>α = −α′</strong>.</p>
+<div class="formula">negativer Winkel = positiver Winkel − 360° &nbsp;&nbsp;&nbsp; Beispiel: 324,25° − 360° = −35,75°</div>
+{box("🧠 Merke", "Positiver Winkel: gegen den Uhrzeigersinn eintragen. Negativer Winkel: im Uhrzeigersinn eintragen. Beide Angaben sind richtig, wenn sie in dieselbe Richtung zeigen.")}
 {box("💡 Sonderfälle", "Ist F<sub>x</sub> = 0, zeigt die Kraft genau nach oben (90°) oder unten (270°). Ist F<sub>y</sub> = 0, zeigt sie nach rechts (0°) oder links (180°).")}
 """,
  short=f"""
@@ -403,6 +412,7 @@ M[3] = dict(
 {QUAD_REGELN}
 <p><strong>Beispiel:</strong> {Fi("x")} = −163,69 N, {Fi("y")} = 135,17 N → F = 212,29 N, II. Quadrant, α′ = 39,55°, α = 140,45°.</p>
 <p>Der Rechner liefert bei arctan nur −90° bis +90°. Nie ungeprüft übernehmen!</p>
+<p><strong>Negative Winkel</strong> werden im Uhrzeigersinn eingetragen. −30° ist dieselbe Richtung wie 330°. Im IV. Quadranten gilt deshalb auch α = −α′.</p>
 """,
 )
 
