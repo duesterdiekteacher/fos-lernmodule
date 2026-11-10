@@ -37,16 +37,21 @@ function quadrant(x, y) { return x > 0 ? (y > 0 ? 1 : 4) : (y > 0 ? 2 : 3); }
 const QN = ['', 'I.', 'II.', 'III.', 'IV.'];
 const hilfswinkel = (x, y) => Math.atan(Math.abs(y) / Math.abs(x)) / RAD;
 const rechnerWinkel = (x, y) => Math.atan(y / x) / RAD;      // was der Taschenrechner direkt liefert
-// Rechenweg: Komponenten mit Vorzeichen in arctan einsetzen, dann Pfeilspitze prüfen
+// Rechenweg: Komponenten mit Vorzeichen in arctan einsetzen, Ergebnis nur interpretieren (Wirkungslinie + Richtung der Spitze)
 const klammer = v => v < 0 ? '(' + d2(v) + ')' : d2(v);
 function winkelWeg(x, y, fy, fx) {
     const r = rechnerWinkel(x, y);
-    let s = 'α = arctan(' + d2(y) + ' / ' + klammer(x) + ') = ' + d1(r) + '°. ';
-    if (x > 0) return s + fx + ' positiv: Die Spitze zeigt nach rechts. Der Wert passt: α = <strong>' + d1(r) + '°</strong>' + (r < 0 ? ' (oder ' + d1(r + 360) + '°)' : '');
-    return s + fx + ' negativ: Die Spitze muss nach links zeigen. α = ' + d1(r) + '° + 180° = <strong>' + d1(r + 180) + '°</strong>' + (r + 180 > 180 ? ' (oder ' + d1(r - 180) + '°)' : '');
+    return 'α = arctan(' + d2(y) + ' / ' + klammer(x) + ') = <strong>' + d1(r) + '°</strong>. ' +
+        (r < 0 ? 'Im Uhrzeigersinn' : 'Gegen den Uhrzeigersinn') + ' ab der x-Achse eintragen. ' +
+        fx + ' ist ' + (x > 0 ? 'positiv' : 'negativ') + ': Die Spitze zeigt nach <strong>' + richtung(x, y) + '</strong>.';
 }
-const MSG_RECHNER = 'Das ist der Rechnerwert. Er trifft die Wirkungslinie, aber die Spitze zeigt falsch herum. F_x ist negativ: 180° addieren.';
-const MSG_BETRAG = 'Haben Sie ohne Minuszeichen gerechnet? Setzen Sie F_x und F_y mit Vorzeichen ein. Dann die Pfeilspitze prüfen.';
+const richtung = (x, y) => (x > 0 ? 'rechts' : 'links') + ' ' + (y > 0 ? 'oben' : 'unten');
+// Antwortfeld Winkel: Formelwert ist die Lösung; der gleichwertige Winkel 0°…360° wird ebenfalls akzeptiert
+const winkelFeld = (label, x, y, tol, errors) => {
+    const r = rechnerWinkel(x, y), a = winkelVon(x, y);
+    return { label, unit: '°', ans: T(r), alt: [T(a), T(a - 360)], tol, errors };
+};
+const MSG_BETRAG = 'Haben Sie ohne Minuszeichen gerechnet? Setzen Sie F_x und F_y mit Vorzeichen ein.';
 const BASIS = [15, 20, 25, 30, 35, 40, 50, 55, 60, 65, 70, 75];
 function zufallsWinkel(q) { return (q - 1) * 90 + rnd(BASIS); }
 const FV = n => '<em>F</em><sub>' + n + '</sub>';               // F mit Index im HTML-Text
@@ -390,60 +395,57 @@ const M3 = {
             const F = Math.hypot(p[0], p[1]), a = winkelVon(p[0], p[1]), h = hilfswinkel(p[0], p[1]);
             fields.push({ label: 'Kraft ' + (j + 1) + ': Betrag F =', unit: 'N', ans: T(F), tol: 60,
                 errors: [{ v: T(Math.abs(p[0]) + Math.abs(p[1])), msg: 'Die Komponenten nicht einfach addieren. Satz des Pythagoras!', tol: 60 }] });
-            fields.push({ label: 'Kraft ' + (j + 1) + ': Winkel α =', unit: '°', ans: T(a), alt: [T(a - 360)], tol: 150,
-                errors: [{ v: T(rechnerWinkel(p[0], p[1])), msg: MSG_RECHNER, tol: 150 },
-                         { v: T(h), msg: MSG_BETRAG, tol: 150 },
-                         { v: T(360 - a), msg: 'Im Uhrzeigersinn gemessen? Dann ist der Winkel negativ. Achten Sie auf das Minuszeichen.', tol: 150 }] });
+            fields.push(winkelFeld('Kraft ' + (j + 1) + ': Winkel α =', p[0], p[1], 150,
+                [{ v: T(h), msg: MSG_BETRAG, tol: 150 }]));
         });
         return {
             type: 'num', q: 'Berechnen Sie Betrag und Winkel.<ul>' + ps.map((p, j) => '<li>Kraft ' + (j + 1) + ': F<sub>x</sub> = ' + de(p[0]) + ' N, F<sub>y</sub> = ' + de(p[1]) + ' N</li>').join('') + '</ul>',
-            note: 'Betrag auf zwei, Winkel auf eine Nachkommastelle runden. Negative Winkel (im Uhrzeigersinn) sind erlaubt.',
+            note: 'Betrag auf zwei, Winkel auf eine Nachkommastelle runden. Geben Sie den Winkel so an, wie ihn die Formel liefert.',
             fields,
-            hint: 'F = √(F<sub>x</sub>² + F<sub>y</sub>²). Winkel: α = arctan(F<sub>y</sub> / F<sub>x</sub>) mit Vorzeichen. Dann prüfen: Ist F<sub>x</sub> negativ, muss die Spitze nach links zeigen → + 180°.',
+            hint: 'F = √(F<sub>x</sub>² + F<sub>y</sub>²). Winkel: α = arctan(F<sub>y</sub> / F<sub>x</sub>) mit Vorzeichen einsetzen. Das Ergebnis ist der Winkel.',
             explanation: ps.map((p, j) => {
                 return 'Kraft ' + (j + 1) + ': F = <strong>' + d2(Math.hypot(p[0], p[1])) + ' N</strong>. ' + winkelWeg(p[0], p[1], 'F_y', 'F<sub>x</sub>');
             }).join('<br>')
         };
     },
     regel: {
-        type: 'match', q: 'Alle vier Kräfte haben |F<sub>x</sub>| = 300 N und |F<sub>y</sub>| = 400 N. Nur die Vorzeichen sind verschieden. Welcher Winkel gehört zu welcher Kraft?',
-        options: ['53,13°', '126,87°', '233,13°', '−53,13°'],
-        items: [{ left: 'Fx = 300 N, Fy = 400 N', answer: '53,13°' },
-                { left: 'Fx = −300 N, Fy = 400 N', answer: '126,87°' },
-                { left: 'Fx = −300 N, Fy = −400 N', answer: '233,13°' },
-                { left: 'Fx = 300 N, Fy = −400 N', answer: '−53,13°' }],
-        hint: 'Setzen Sie mit Vorzeichen in arctan(F<sub>y</sub> / F<sub>x</sub>) ein. Ist F<sub>x</sub> negativ, zeigt die Spitze nach links: + 180°.',
-        explanation: 'arctan(400 / 300) = 53,13°: passt. &nbsp;arctan(400 / (−300)) = −53,13°, F<sub>x</sub> negativ → + 180° = 126,87°. &nbsp;arctan((−400) / (−300)) = 53,13°, F<sub>x</sub> negativ → + 180° = 233,13° (oder −126,87°). &nbsp;arctan((−400) / 300) = −53,13°: passt, im Uhrzeigersinn.'
+        type: 'match', q: 'Alle vier Kräfte haben |F<sub>x</sub>| = 300 N und |F<sub>y</sub>| = 400 N. Nur die Vorzeichen sind verschieden. Was liefert die Formel, und wohin zeigt die Spitze?',
+        options: ['α = 53,13°, Spitze nach rechts oben', 'α = −53,13°, Spitze nach links oben', 'α = 53,13°, Spitze nach links unten', 'α = −53,13°, Spitze nach rechts unten'],
+        items: [{ left: 'Fx = 300 N, Fy = 400 N', answer: 'α = 53,13°, Spitze nach rechts oben' },
+                { left: 'Fx = −300 N, Fy = 400 N', answer: 'α = −53,13°, Spitze nach links oben' },
+                { left: 'Fx = −300 N, Fy = −400 N', answer: 'α = 53,13°, Spitze nach links unten' },
+                { left: 'Fx = 300 N, Fy = −400 N', answer: 'α = −53,13°, Spitze nach rechts unten' }],
+        hint: 'Setzen Sie mit Vorzeichen in arctan(F<sub>y</sub> / F<sub>x</sub>) ein. Die Richtung der Spitze verraten die Vorzeichen von F<sub>x</sub> und F<sub>y</sub>.',
+        explanation: 'Gleiche Vorzeichen ergeben +53,13°, verschiedene Vorzeichen −53,13°. Der Winkel legt nur die Wirkungslinie fest. F<sub>x</sub> positiv → Spitze rechts, F<sub>x</sub> negativ → Spitze links.'
     },
     reihenfolge: {
         type: 'order', q: 'Sie kennen F<sub>x</sub> und F<sub>y</sub>. Bringen Sie die Schritte zur Bestimmung von α in die richtige Reihenfolge.',
         steps: ['F<sub>x</sub> und F<sub>y</sub> mit Vorzeichen aufschreiben.',
                 'Einsetzen: α = arctan(F<sub>y</sub> / F<sub>x</sub>).',
-                'Rechnerwert ab der positiven x-Achse eintragen: positiv gegen, negativ im Uhrzeigersinn.',
-                'Pfeilspitze prüfen: Zeigt sie nach rechts (F<sub>x</sub> positiv) oder links (F<sub>x</sub> negativ)?',
-                'Zeigt die Spitze falsch herum: 180° addieren.'],
+                'Winkel ab der positiven x-Achse eintragen (positiv gegen, negativ im Uhrzeigersinn). Das ist die Wirkungslinie.',
+                'Richtung der Spitze bestimmen: rechts bei positivem F<sub>x</sub>, links bei negativem F<sub>x</sub>.'],
         top: 'zuerst', bottom: 'zuletzt',
-        hint: 'Erst einsetzen, dann eintragen, zum Schluss die Spitze prüfen.',
-        explanation: 'Vorzeichen → arctan → eintragen → Spitze prüfen → bei Bedarf + 180°.'
+        hint: 'Erst einsetzen, dann eintragen, zum Schluss die Spitze bestimmen.',
+        explanation: 'Vorzeichen → arctan → Wirkungslinie eintragen → Richtung der Spitze.'
     },
     debatte: debateTask({
-        q: 'Gegeben: F<sub>x</sub> = −120 N und F<sub>y</sub> = 90 N. Zwei Mitschüler rechnen den Winkel aus.',
-        people: [['Lena', 'Mein Taschenrechner zeigt bei arctan(90 / −120) den Wert −36,87°. Also ist α = −36,87°.'],
-                 ['Emre', 'Das kann nicht stimmen. Der richtige Winkel ist α = 143,13°.']],
+        q: 'Gegeben: F<sub>x</sub> = −120 N und F<sub>y</sub> = 90 N. Beide rechnen α = arctan(90 / (−120)) = −36,87°. Dann zeichnen sie den Pfeil.',
+        people: [['Lena', 'Der Winkel ist negativ, also im Uhrzeigersinn. Mein Pfeil zeigt nach rechts unten.'],
+                 ['Emre', 'Die Wirkungslinie liegt bei −36,87°. Mein Pfeil zeigt aber nach links oben.']],
         winner: 'Emre',
-        whoErrors: [{ v: 'Lena', msg: 'Tragen Sie −36,87° im Uhrzeigersinn ein. Wohin zeigt die Spitze? Und wohin muss eine Kraft mit negativem F_x zeigen?' }],
-        reasons: [['Die Wirkungslinie stimmt, aber die Spitze zeigt falsch herum. F_x ist negativ, also 180° addieren: 143,13°.'],
-                  ['Negative Winkel gibt es nicht.', 'Negative Winkel gibt es: Sie werden im Uhrzeigersinn eingetragen. Das Problem ist die Richtung der Spitze.'],
-                  ['Man muss zum Ergebnis des Taschenrechners immer 180° addieren.', 'Nur wenn F_x negativ ist. Bei positivem F_x stimmt der Rechnerwert schon.'],
-                  ['Der Taschenrechner steht im falschen Modus.', 'DEG ist richtig eingestellt. Lena hat nur die Pfeilspitze nicht geprüft.']],
-        hint: 'Zeichnen Sie −36,87° ein. Zeigt die Spitze dorthin, wo F_x und F_y hinzeigen?',
-        explanation: 'Emre hat recht. Lenas Einsetzen war richtig, aber sie hat die Spitze nicht geprüft. −36,87° zeigt nach rechts unten. Das ist die richtige Wirkungslinie, aber die falsche Richtung. F<sub>x</sub> ist negativ, die Spitze muss nach links zeigen: α = −36,87° + 180° = <strong>143,13°</strong>.'
+        whoErrors: [{ v: 'Lena', msg: 'Die Wirkungslinie stimmt. Aber wohin muss eine Kraft mit negativem F_x zeigen?' }],
+        reasons: [['Der Winkel legt die Wirkungslinie fest. F_x ist negativ, also zeigt die Spitze nach links.'],
+                  ['Ein negativer Winkel zeigt immer nach rechts unten.', 'Er wird im Uhrzeigersinn eingetragen. Das ergibt die Linie. Wohin die Spitze zeigt, sagen die Vorzeichen.'],
+                  ['Man muss zum Winkel noch 180° addieren.', 'Nein. Der Winkel bleibt so, wie ihn die Formel liefert. Man interpretiert nur die Richtung der Spitze.'],
+                  ['Der Taschenrechner steht im falschen Modus.', 'DEG ist richtig eingestellt. Beide haben richtig gerechnet.']],
+        hint: 'Beide Pfeile liegen auf derselben Linie. Welche Richtung passt zu negativem F_x und positivem F_y?',
+        explanation: 'Emre hat recht. −36,87° ist richtig und bleibt stehen. Im Uhrzeigersinn eingetragen ergibt er die Wirkungslinie. F<sub>x</sub> ist negativ und F<sub>y</sub> positiv. Also zeigt die Spitze nach <strong>links oben</strong>.'
     }),
     erklaeren: {
         type: 'text', level: 'In eigenen Worten',
-        q: 'Ein Mitschüler rechnet α = arctan(F<sub>y</sub> / F<sub>x</sub>) und schreibt das Ergebnis sofort hin. Wann ist das richtig, wann nicht? Was muss er noch tun? Nutzen Sie ein Beispiel.',
-        model: 'Der Taschenrechner liefert bei arctan nur Winkel zwischen −90° und +90°. Damit trifft er immer die richtige Wirkungslinie. Die Spitze kann aber falsch herum zeigen. Ist F<sub>x</sub> positiv, zeigt die Spitze nach rechts und der Wert stimmt. Ist F<sub>x</sub> negativ, muss die Spitze nach links zeigen. Dann addiert man 180°. Beispiel: F<sub>x</sub> = −120 N, F<sub>y</sub> = 90 N. Der Rechner zeigt −36,87°. Das zeigt nach rechts unten. Richtig ist −36,87° + 180° = 143,13°.',
-        checklist: ['Die Komponenten werden mit Vorzeichen eingesetzt.', 'Der Rechner liefert nur Winkel zwischen −90° und +90°.', 'Er trifft die Wirkungslinie, aber nicht immer die Richtung der Spitze.', 'Bei negativem F<sub>x</sub>: 180° addieren.', 'Ein passendes Zahlenbeispiel.'],
+        q: 'Ein Mitschüler rechnet bei F<sub>x</sub> = −120 N und F<sub>y</sub> = 90 N den Winkel α = −36,87° aus. Er zeichnet den Pfeil nach rechts unten. Erklären Sie ihm, wie man den Winkel richtig interpretiert.',
+        model: 'Der Winkel −36,87° ist richtig. Er startet an der x-Achse und wird im Uhrzeigersinn eingetragen. Damit liegt die Wirkungslinie fest. Auf dieser Linie kann der Pfeil aber in zwei Richtungen zeigen. Welche richtig ist, sagt das Vorzeichen von F<sub>x</sub>. Hier ist F<sub>x</sub> negativ. Also zeigt die Spitze nach links, genauer nach links oben.',
+        checklist: ['Der Winkel aus der Formel bleibt unverändert.', 'Er wird ab der x-Achse eingetragen (negativ: im Uhrzeigersinn).', 'Er legt die Wirkungslinie fest.', 'Das Vorzeichen von F<sub>x</sub> entscheidet, ob die Spitze nach rechts oder links zeigt.', 'Ergebnis: Spitze nach links oben.'],
         explanation: 'Vergleichen Sie Ihre Antwort mit der Musterlösung und haken Sie ab, was Sie schon drin haben.',
         hint: ''
     }
@@ -548,15 +550,13 @@ const M4 = {
               errors: [{ v: T(-y), msg: 'Vorzeichen prüfen. Addieren Sie die y-Komponenten mit ihren Vorzeichen.', tol: 100 }] },
             { label: 'Betrag F<sub>res</sub> =', unit: 'N', ans: T(F), tol: 100,
               errors: [{ v: T(kr.reduce((s, k) => s + k.F, 0)), msg: 'Die Beträge darf man nicht einfach addieren. Rechnen Sie mit den Komponenten.', tol: 100 }] },
-            { label: 'Winkel α<sub>res</sub> =', unit: '°', ans: T(a), alt: [T(a - 360)], tol: 200,
-              errors: [{ v: T(rechnerWinkel(x, y)), msg: MSG_RECHNER, tol: 200 },
-                       { v: T(h), msg: MSG_BETRAG, tol: 200 }] }
+            winkelFeld('Winkel α<sub>res</sub> =', x, y, 200, [{ v: T(h), msg: MSG_BETRAG, tol: 200 }])
         ];
         return {
             type: 'num', svg: kraefteSvg(kr), q: 'Drei Kräfte greifen an einem Punkt an. Berechnen Sie die resultierende Kraft.' + kraftListe(kr),
             note: 'Komponenten und Betrag auf zwei, Winkel auf eine Nachkommastelle runden.',
             fields,
-            hint: 'Jede Kraft zerlegen. Alle x-Komponenten addieren, alle y-Komponenten addieren. Dann Betrag mit Pythagoras. Winkel mit arctan(F<sub>res,y</sub> / F<sub>res,x</sub>) und Pfeilspitze prüfen.',
+            hint: 'Jede Kraft zerlegen. Alle x-Komponenten addieren, alle y-Komponenten addieren. Dann Betrag mit Pythagoras. Winkel mit arctan(F<sub>res,y</sub> / F<sub>res,x</sub>), dann die Richtung der Spitze angeben.',
             explanation: kr.map((k, j) => { const c = komp(k.F, k.a); return 'F' + IDX[j] + ': (' + d2(c[0]) + ' N | ' + d2(c[1]) + ' N)'; }).join('<br>') +
                 '<br>F<sub>res,x</sub> = <strong>' + d2(x) + ' N</strong>, F<sub>res,y</sub> = <strong>' + d2(y) + ' N</strong>' +
                 '<br>F<sub>res</sub> = <strong>' + d2(F) + ' N</strong>. ' + winkelWeg(x, y, 'F<sub>res,y</sub>', 'F<sub>res,x</sub>')
@@ -620,17 +620,14 @@ const M5 = {
             { label: 'F<sub>3,y</sub> =', unit: 'N', ans: T(y), tol: 100,
               errors: [{ v: T(ry), msg: 'Das ist die y-Komponente der Resultierenden. Vorzeichen umdrehen!', tol: 100 }] },
             { label: 'Betrag F<sub>3</sub> =', unit: 'N', ans: T(F), tol: 100 },
-            { label: 'Winkel α<sub>3</sub> =', unit: '°', ans: T(a), alt: [T(a - 360)], tol: 200,
-              errors: [{ v: T(winkelVon(rx, ry)), msg: 'Das ist der Winkel der Resultierenden. F₃ zeigt genau entgegengesetzt: ±180°.', tol: 200 },
-                       { v: T(rechnerWinkel(x, y)), msg: MSG_RECHNER, tol: 200 },
-                       { v: T(hilfswinkel(x, y)), msg: MSG_BETRAG, tol: 200 }] }
+            winkelFeld('Winkel α<sub>3</sub> =', x, y, 200, [{ v: T(hilfswinkel(x, y)), msg: MSG_BETRAG, tol: 200 }])
         ];
         return {
             type: 'num', svg: kraefteSvg(kr), q: 'Zwei Kräfte greifen an einem Punkt an. Eine dritte Kraft F<sub>3</sub> soll für Gleichgewicht sorgen. Berechnen Sie F<sub>3</sub>.' + kraftListe(kr),
             note: 'Komponenten und Betrag auf zwei, Winkel auf eine Nachkommastelle runden.',
             fields,
             hint: 'Erst die Resultierende von F₁ und F₂ bestimmen. Dann gilt: F₃ hat die Komponenten mit umgekehrtem Vorzeichen.',
-            explanation: 'Resultierende von F₁ und F₂: (' + d2(rx) + ' N | ' + d2(ry) + ' N).<br>Gleichgewichtskraft: F<sub>3</sub> = <strong>(' + d2(x) + ' N | ' + d2(y) + ' N)</strong>, Betrag <strong>' + d2(F) + ' N</strong>, Winkel <strong>' + d1(a) + '°</strong>.'
+            explanation: 'Resultierende von F₁ und F₂: (' + d2(rx) + ' N | ' + d2(ry) + ' N).<br>Gleichgewichtskraft: F<sub>3</sub> = <strong>(' + d2(x) + ' N | ' + d2(y) + ' N)</strong>, Betrag <strong>' + d2(F) + ' N</strong>.<br>' + winkelWeg(x, y, 'F<sub>3,y</sub>', 'F<sub>3,x</sub>')
         };
     },
     zeichnen: function () {
@@ -788,13 +785,12 @@ const M6 = {
         return {
             type: 'num', svg: skizze,
             q: raketeText(r) + ' In welchem Winkel α muss die Düse des Triebwerks stehen? Gemeint ist der Winkel der Triebwerkskraft F<sub>T</sub> zur positiven x-Achse.',
-            fields: [{ label: 'α =', unit: '°', ans: T(a), alt: [T(a - 360)], tol: 150,
-                errors: [{ v: T(rechnerWinkel(x, y)), msg: 'Das ist der Rechnerwert. Er trifft die Wirkungslinie, aber die Spitze zeigt falsch herum. F_T,x ist negativ: 180° addieren.', tol: 150 },
-                         { v: T(h), msg: 'Haben Sie ohne Minuszeichen gerechnet? Setzen Sie F_T,x und F_T,y mit Vorzeichen ein. Dann die Pfeilspitze prüfen.', tol: 150 },
-                         { v: T(90 - h), msg: 'Das ist der Winkel zur y-Achse. Gesucht ist der Winkel zur positiven x-Achse.', tol: 150 }] }],
+            fields: [winkelFeld('α =', x, y, 150,
+                [{ v: T(h), msg: 'Haben Sie ohne Minuszeichen gerechnet? Setzen Sie F_T,x und F_T,y mit Vorzeichen ein.', tol: 150 },
+                 { v: T(90 - h), msg: 'Das ist der Winkel zur y-Achse. Gesucht ist der Winkel zur positiven x-Achse.', tol: 150 }])],
             note: 'Runden Sie auf eine Nachkommastelle.',
-            hint: 'α = arctan(F<sub>T,y</sub> / F<sub>T,x</sub>) mit Vorzeichen. F<sub>T,x</sub> ist negativ: Wohin muss die Spitze zeigen?',
-            explanation: winkelWeg(x, y, 'F<sub>T,y</sub>', 'F<sub>T,x</sub>') + '.'
+            hint: 'α = arctan(F<sub>T,y</sub> / F<sub>T,x</sub>) mit Vorzeichen einsetzen. Dann angeben, wohin die Spitze zeigt.',
+            explanation: winkelWeg(x, y, 'F<sub>T,y</sub>', 'F<sub>T,x</sub>')
         };
     },
     schweben: {
