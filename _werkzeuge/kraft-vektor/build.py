@@ -164,13 +164,13 @@ def sk_zerlegen():
 def sk_hilfswinkel():
     x, y = -163.69, 135.17
     k = K(-300, 300, 100, size=360, ux=sub("F", "x") + " in N", uy=sub("F", "y") + " in N",
-          aria="Kraft im II. Quadranten mit Hilfswinkel und Winkel zur x-Achse")
-    k.strich(x, 0, x, y)
-    k.bogen(140.45, 30, "#fbbf24", "α", rtxt=44)
-    k.bogen(180, 70, "#38bdf8", "α′", a0=140.45, rtxt=88)
+          aria="Kraft nach links oben. Der Taschenrechner liefert minus 39,55 Grad, richtig sind 140,45 Grad")
+    k.pfeil(0, 0, -x, -y, "#38bdf8", 3, dash=True)
+    k.bogen(0, 62, "#38bdf8", "−39,55°", a0=-39.55, rtxt=92)
+    k.bogen(140.45, 34, "#fbbf24", "α", rtxt=50)
     k.pfeil(0, 0, x, y, "#f8fafc", 5)
     k.text(x - 10, y + 30, "F = 212,29 N", "#f8fafc", 14)
-    return k.svg("α′ liegt zwischen Pfeil und x-Achse (blau). α wird immer ab der positiven x-Achse gemessen (gelb): α = 180° − α′.")
+    return k.svg("Blau: Der Rechner liefert −39,55°. Das ist die richtige Wirkungslinie, aber die Spitze zeigt nach rechts. Weiß: F<sub>x</sub> ist negativ, die Spitze muss nach links zeigen. Gelb: α = −39,55° + 180° = 140,45°.")
 
 
 KR = [(500, 115, "#38bdf8"), (260, 195, "#f59e0b"), (390, 320, "#4ade80")]
@@ -248,12 +248,10 @@ SK_GG = sk_gleichgewicht()
 SK_RAK = sk_rakete()
 
 KOMP_FORMELN = f'<div class="formula big">{Fi("x")} = F · cos α &nbsp;&nbsp;&nbsp; {Fi("y")} = F · sin α</div>'
-BETRAG_FORMEL = f'<div class="formula big">F = √({Fi("x")}² + {Fi("y")}²) &nbsp;&nbsp;&nbsp; α′ = arctan {frac("|" + Fi("y") + "|", "|" + Fi("x") + "|")}</div>'
+BETRAG_FORMEL = f'<div class="formula big">F = √({Fi("x")}² + {Fi("y")}²) &nbsp;&nbsp;&nbsp; α = arctan {frac(Fi("y"), Fi("x"))}</div>'
 QUAD_REGELN = '''<div class="quad">
-<div><strong>II. Quadrant</strong><br>F<sub>x</sub> −, F<sub>y</sub> +<br>α = 180° − α′</div>
-<div><strong>I. Quadrant</strong><br>F<sub>x</sub> +, F<sub>y</sub> +<br>α = α′</div>
-<div><strong>III. Quadrant</strong><br>F<sub>x</sub> −, F<sub>y</sub> −<br>α = 180° + α′</div>
-<div><strong>IV. Quadrant</strong><br>F<sub>x</sub> +, F<sub>y</sub> −<br>α = 360° − α′<br>oder α = −α′</div>
+<div><strong>F<sub>x</sub> positiv</strong><br>Spitze zeigt nach rechts<br>α = Rechnerwert</div>
+<div><strong>F<sub>x</sub> negativ</strong><br>Spitze zeigt nach links<br>α = Rechnerwert + 180°</div>
 </div>'''
 
 
@@ -378,11 +376,10 @@ M[3] = dict(
 <p>Das Vorzeichen spielt hier keine Rolle, denn beim Quadrieren wird alles positiv.</p>
 
 <h3>Der Winkel in zwei Schritten</h3>
-<p>Der Taschenrechner liefert bei arctan nur Winkel zwischen −90° und +90°. Er weiß nicht, in welchem Quadranten die Kraft liegt. Deshalb geht man so vor:</p>
+<p>Der Winkel startet immer an der <strong>positiven x-Achse</strong>. Ist er positiv, trägt man ihn <strong>gegen den Uhrzeigersinn</strong> ein. Ist er negativ, trägt man ihn <strong>im Uhrzeigersinn</strong> ein.</p>
 <ol class="schritte">
-<li><strong>Quadrant bestimmen</strong> aus den Vorzeichen von {Fi("x")} und {Fi("y")}.</li>
-<li><strong>Hilfswinkel α′ berechnen</strong> mit den Beträgen (ohne Minuszeichen): α′ = arctan({frac("|" + Fi("y") + "|", "|" + Fi("x") + "|")}). α′ ist der spitze Winkel zwischen Pfeil und x-Achse.</li>
-<li><strong>α mit der Quadranten-Regel</strong> berechnen.</li>
+<li><strong>Komponenten mit Vorzeichen einsetzen:</strong> α = arctan({frac(Fi("y"), Fi("x"))}). Minuszeichen nicht weglassen!</li>
+<li><strong>Pfeilspitze prüfen:</strong> Der Rechner liefert nur Winkel zwischen −90° und +90°. Damit trifft er immer die richtige <strong>Wirkungslinie</strong>. Die Spitze kann aber falsch herum zeigen. Ist {Fi("x")} negativ, muss die Spitze nach links zeigen. Dann rechnet man <strong>+ 180°</strong>.</li>
 </ol>
 {QUAD_REGELN}
 {SK_HILF}
@@ -390,29 +387,29 @@ M[3] = dict(
 <h3>Beispiel</h3>
 <p>{Fi("x")} = −163,69 N, {Fi("y")} = 135,17 N.</p>
 {table(["Schritt", "Rechnung"], [
-  ["Betrag", "F = √(163,69² + 135,17²) N = 212,29 N"],
-  ["① Quadrant", "F<sub>x</sub> negativ, F<sub>y</sub> positiv → II. Quadrant"],
-  ["② Hilfswinkel", "α′ = arctan(135,17 / 163,69) = 39,55°"],
-  ["③ Winkel", "α = 180° − 39,55° = 140,45°"]])}
-{box("⚠️ Achtung", "Tippt man arctan(135,17 / −163,69) direkt ein, zeigt der Rechner −39,55°. Das wäre der IV. Quadrant, also falsch. Darum immer zuerst den Quadranten bestimmen.")}
+  ["Betrag", "F = √((−163,69)² + 135,17²) N = 212,29 N"],
+  ["① Einsetzen", "α = arctan(135,17 / (−163,69)) = −39,55°"],
+  ["② Spitze prüfen", "F<sub>x</sub> negativ → Spitze nach links. −39,55° zeigt nach rechts unten, also falsch herum."],
+  ["Ergebnis", "α = −39,55° + 180° = 140,45°"]])}
+{box("🧠 Merke", "Der Rechner liefert die richtige Linie. Sie entscheiden nur noch, in welche Richtung die Spitze zeigt. F<sub>x</sub> positiv: fertig. F<sub>x</sub> negativ: 180° addieren.")}
 <h3>Negative Winkel</h3>
 <p>Ein Winkel kann auch <strong>negativ</strong> sein. Ein negativer Winkel bedeutet: Man trägt ihn ab der positiven x-Achse <strong>im Uhrzeigersinn</strong> ein.</p>
 <ul>
 <li>α = −30° zeigt in dieselbe Richtung wie α = 330°.</li>
 <li>α = −90° zeigt senkrecht nach unten, genau wie α = 270°.</li>
 </ul>
-<p>Im IV. Quadranten ist das besonders praktisch: Statt α = 360° − α′ schreibt man einfach <strong>α = −α′</strong>.</p>
+<p>Deshalb darf man einen negativen Rechnerwert direkt stehen lassen, wenn {Fi("x")} positiv ist. Beispiel: {Fi("x")} = 300 N, {Fi("y")} = −216 N ergibt α = −35,75°. Die Spitze zeigt nach rechts unten. Das passt.</p>
 <div class="formula">negativer Winkel = positiver Winkel − 360° &nbsp;&nbsp;&nbsp; Beispiel: 324,25° − 360° = −35,75°</div>
 {box("🧠 Merke", "Positiver Winkel: gegen den Uhrzeigersinn eintragen. Negativer Winkel: im Uhrzeigersinn eintragen. Beide Angaben sind richtig, wenn sie in dieselbe Richtung zeigen.")}
 {box("💡 Sonderfälle", "Ist F<sub>x</sub> = 0, zeigt die Kraft genau nach oben (90°) oder unten (270°). Ist F<sub>y</sub> = 0, zeigt sie nach rechts (0°) oder links (180°).")}
 """,
  short=f"""
 {BETRAG_FORMEL}
-<p>1. Quadrant aus den Vorzeichen. 2. Hilfswinkel α′ mit Beträgen. 3. Quadranten-Regel:</p>
+<p>1. {Fi("x")} und {Fi("y")} <strong>mit Vorzeichen</strong> einsetzen. 2. Pfeilspitze prüfen:</p>
 {QUAD_REGELN}
-<p><strong>Beispiel:</strong> {Fi("x")} = −163,69 N, {Fi("y")} = 135,17 N → F = 212,29 N, II. Quadrant, α′ = 39,55°, α = 140,45°.</p>
-<p>Der Rechner liefert bei arctan nur −90° bis +90°. Nie ungeprüft übernehmen!</p>
-<p><strong>Negative Winkel</strong> werden im Uhrzeigersinn eingetragen. −30° ist dieselbe Richtung wie 330°. Im IV. Quadranten gilt deshalb auch α = −α′.</p>
+<p><strong>Beispiel:</strong> {Fi("x")} = −163,69 N, {Fi("y")} = 135,17 N → F = 212,29 N. arctan(135,17 / (−163,69)) = −39,55°. {Fi("x")} negativ → α = −39,55° + 180° = 140,45°.</p>
+<p>Der Rechner liefert bei arctan nur −90° bis +90°. Er trifft die Linie, nicht unbedingt die Spitze.</p>
+<p><strong>Negative Winkel</strong> werden im Uhrzeigersinn eingetragen. Der Winkel startet immer an der positiven x-Achse. −30° ist dieselbe Richtung wie 330°.</p>
 """,
 )
 
@@ -440,7 +437,7 @@ M[4] = dict(
 <h3>Beispiel</h3>
 {BSP_TAB}
 <p>{Fi("res")} = √({de(BSX)}² + {de(BSY)}²) N = <strong>{de(BF)} N</strong>.</p>
-<p>II. Quadrant, α′ = arctan({de(BSY)} / {de(abs(BSX))}) = {de(BH)}°, also α<sub>res</sub> = 180° − {de(BH)}° = <strong>{de(BA)}°</strong>.</p>
+<p>α = arctan({de(BSY)} / ({de(BSX)})) = −{de(BH)}°. {Fi("res,x")} ist negativ: Die Spitze zeigt nach links. Also α<sub>res</sub> = −{de(BH)}° + 180° = <strong>{de(BA)}°</strong>.</p>
 {box("⚠️ Beträge nie einfach addieren!", f"500 N + 260 N + 390 N = 1150 N ist <strong>falsch</strong>. Die Kräfte zeigen in verschiedene Richtungen und heben sich teilweise auf. Richtig sind {de(BF)} N. Beträge darf man nur addieren, wenn alle Kräfte in dieselbe Richtung zeigen.")}
 """,
  short=f"""
